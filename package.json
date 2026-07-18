@@ -1,0 +1,14 @@
+{
+  "name": "smart-agriculture-marketplace",
+  "version": "1.0.0",
+  "description": "Full-stack Smart Agriculture Marketplace connecting farmers and buyers",
+  "scripts": {
+    "install-all": "npm install && cd server && npm install && cd ../client && npm install --legacy-peer-deps",
+    "server": "cd server && npm start",
+    "client": "cd client && npm run dev",
+    "dev": "concurrently \"npm run server\" \"npm run client\""
+  },
+  "dependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

@@ -1,0 +1,20 @@
+[
+  {
+    "_id": "auction_1",
+    "crop": "crop_2",
+    "durationHours": 24,
+    "startTime": "2026-07-18T01:33:59.685Z",
+    "endTime": "2026-07-19T01:33:59.685Z",
+    "bids": [
+      {
+        "buyer": "user_buyer_1",
+        "amount": 32,
+        "timestamp": "2026-07-18T02:33:59.685Z"
+      }
+    ],
+    "highestBid": 32,
+    "highestBidder": "user_buyer_1",
+    "status": "active",
+    "createdAt": "2026-07-18T01:33:59.685Z"
+  }
+]

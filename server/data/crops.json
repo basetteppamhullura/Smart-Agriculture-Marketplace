@@ -1,0 +1,1052 @@
+[
+  {
+    "_id": "crop_1",
+    "farmer": "user_farmer_1",
+    "name": "Sona Masuri Rice (Aged)",
+    "localName": "ಸೋನಾ ಮಸೂರಿ ಅಕ್ಕಿ (Sona Masuri)",
+    "category": "Grains",
+    "quantity": 2500,
+    "qualityGrade": "Premium",
+    "harvestDate": "2026-07-08T00:00:00.000Z",
+    "location": "Mandya, Karnataka",
+    "district": "Mandya",
+    "village": "Koppa Village",
+    "listingMode": "buynow",
+    "price": 55,
+    "aiPriceRecommended": 52,
+    "imageUrl": "https://images.unsplash.com/photo-1536304997881-a372c179924b?auto=format&fit=crop&w=600&q=80",
+    "images": [
+      "https://images.unsplash.com/photo-1536304997881-a372c179924b?auto=format&fit=crop&w=600&q=80"
+    ],
+    "stockStatus": "in-stock",
+    "deliveryOption": "logistics-delivery",
+    "status": "available",
+    "analytics": {
+      "views": 180,
+      "ordersCount": 4,
+      "revenue": 22000
+    },
+    "description": "Lightweight, unpolished aged Sona Masuri rice. Sourced from organic Mandya belt.",
+    "createdAt": "2026-07-15T05:33:59.684Z"
+  },
+  {
+    "_id": "crop_2",
+    "farmer": "user_farmer_1",
+    "name": "Basmati Rice (Long-Grain)",
+    "localName": "ಬಾಸ್ಮತಿ ಅಕ್ಕಿ (Basmati)",
+    "category": "Grains",
+    "quantity": 1500,
+    "qualityGrade": "Premium",
+    "harvestDate": "2026-07-10T00:00:00.000Z",
+    "location": "Mysuru, Karnataka",
+    "district": "Mysuru",
+    "village": "Bannur",
+    "listingMode": "buynow",
+    "price": 95,
+    "aiPriceRecommended": 90,
+    "imageUrl": "https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=600&q=80",
+    "images": [
+      "https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=600&q=80"
+    ],
+    "stockStatus": "in-stock",
+    "deliveryOption": "logistics-delivery",
+    "status": "available",
+    "analytics": {
+      "views": 120,
+      "ordersCount": 1,
+      "revenue": 9500
+    },
+    "description": "Slender grains with rich aroma, aged 12 months for culinary quality.",
+    "createdAt": "2026-07-16T05:33:59.684Z"
+  },
+  {
+    "_id": "crop_3",
+    "farmer": "user_farmer_1",
+    "name": "Red Rice (Matta)",
+    "localName": "ಕೆಂಪು ಅಕ್ಕಿ (Red Rice)",
+    "category": "Grains",
+    "quantity": 1200,
+    "qualityGrade": "A",
+    "harvestDate": "2026-07-11T00:00:00.000Z",
+    "location": "Shivamogga, Karnataka",
+    "district": "Shivamogga",
+    "village": "Sagar",
+    "listingMode": "buynow",
+    "price": 68,
+    "aiPriceRecommended": 65,
+    "imageUrl": "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?auto=format&fit=crop&w=600&q=80",
+    "images": [
+      "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?auto=format&fit=crop&w=600&q=80"
+    ],
+    "stockStatus": "in-stock",
+    "deliveryOption": "logistics-delivery",
+    "status": "available",
+    "analytics": {
+      "views": 82,
+      "ordersCount": 0,
+      "revenue": 0
+    },
+    "description": "Thick unpolished red grains containing vital minerals. Harvested in forest soils.",
+    "createdAt": "2026-07-14T05:33:59.684Z"
+  },
+  {
+    "_id": "crop_4",
+    "farmer": "user_farmer_2",
+    "name": "Brown Rice (Nutritious)",
+    "localName": "ಕಂದು ಅಕ್ಕಿ (Brown Rice)",
+    "category": "Grains",
+    "quantity": 1000,
+    "qualityGrade": "A",
+    "harvestDate": "2026-07-12T00:00:00.000Z",
+    "location": "Dharwad, Karnataka",
+    "district": "Dharwad",
+    "village": "Hubli Rural",
+    "listingMode": "buynow",
+    "price": 70,
+    "aiPriceRecommended": 68,
+    "imageUrl": "https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?auto=format&fit=crop&w=600&q=80",
+    "images": [
+      "https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?auto=format&fit=crop&w=600&q=80"
+    ],
+    "stockStatus": "in-stock",
+    "deliveryOption": "logistics-delivery",
+    "status": "available",
+    "analytics": {
+      "views": 60,
+      "ordersCount": 1,
+      "revenue": 7000
+    },
+    "description": "Cleaned whole grain brown rice, retaining healthy outer bran husk layer.",
+    "createdAt": "2026-07-13T05:33:59.684Z"
+  },
+  {
+    "_id": "crop_5",
+    "farmer": "user_farmer_2",
+    "name": "Paddy Rice (Raw)",
+    "localName": "ಭತ್ತ (Paddy)",
+    "category": "Grains",
+    "quantity": 5000,
+    "qualityGrade": "B",
+    "harvestDate": "2026-07-05T00:00:00.000Z",
+    "location": "Belagavi, Karnataka",
+    "district": "Belagavi",
+    "village": "Gokak",
+    "listingMode": "buynow",
+    "price": 24,
+    "aiPriceRecommended": 22,
+    "imageUrl": "https://images.unsplash.com/photo-1530595467537-0b5996c41f2d?auto=format&fit=crop&w=600&q=80",
+    "images": [
+      "https://images.unsplash.com/photo-1530595467537-0b5996c41f2d?auto=format&fit=crop&w=600&q=80"
+    ],
+    "stockStatus": "in-stock",
+    "deliveryOption": "logistics-delivery",
+    "status": "available",
+    "analytics": {
+      "views": 72,
+      "ordersCount": 0,
+      "revenue": 0
+    },
+    "description": "Raw unprocessed paddy from harvest fields. Ready for local sheller mills.",
+    "createdAt": "2026-07-11T05:33:59.685Z"
+  },
+  {
+    "_id": "crop_6",
+    "farmer": "user_farmer_2",
+    "name": "Ragi (Finger Millet)",
+    "localName": "ರಾಗಿ (Finger Millet)",
+    "category": "Millets",
+    "quantity": 4000,
+    "qualityGrade": "Premium",
+    "harvestDate": "2026-07-09T00:00:00.000Z",
+    "location": "Tumakuru, Karnataka",
+    "district": "Tumakuru",
+    "village": "Kunigal",
+    "listingMode": "buynow",
+    "price": 42,
+    "aiPriceRecommended": 40,
+    "imageUrl": "https://images.unsplash.com/photo-1599934254399-b87987ceb72a?auto=format&fit=crop&w=600&q=80",
+    "images": [
+      "https://images.unsplash.com/photo-1599934254399-b87987ceb72a?auto=format&fit=crop&w=600&q=80"
+    ],
+    "stockStatus": "in-stock",
+    "deliveryOption": "logistics-delivery",
+    "status": "available",
+    "analytics": {
+      "views": 245,
+      "ordersCount": 15,
+      "revenue": 64000
+    },
+    "description": "Nutritious calcium-rich red finger millets, highly recommended for health mix formulations.",
+    "createdAt": "2026-07-13T05:33:59.685Z"
+  },
+  {
+    "_id": "crop_7",
+    "farmer": "user_farmer_2",
+    "name": "White Jowar (Sorghum)",
+    "localName": "ಬಿಳಿ ಜೋಳ (Jowar)",
+    "category": "Millets",
+    "quantity": 2000,
+    "qualityGrade": "A",
+    "harvestDate": "2026-07-11T00:00:00.000Z",
+    "location": "Vijayapura, Karnataka",
+    "district": "Vijayapura",
+    "village": "Sindagi",
+    "listingMode": "buynow",
+    "price": 45,
+    "aiPriceRecommended": 42,
+    "imageUrl": "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?auto=format&fit=crop&w=600&q=80",
+    "images": [
+      "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?auto=format&fit=crop&w=600&q=80"
+    ],
+    "stockStatus": "in-stock",
+    "deliveryOption": "logistics-delivery",
+    "status": "available",
+    "analytics": {
+      "views": 90,
+      "ordersCount": 3,
+      "revenue": 13500
+    },
+    "description": "White Sorghum (Jowar) grains, ideal for healthy bhakri/roti flour.",
+    "createdAt": "2026-07-14T05:33:59.685Z"
+  },
+  {
+    "_id": "crop_8",
+    "farmer": "user_farmer_1",
+    "name": "Pearl Millet (Bajra)",
+    "localName": "ಸಜ್ಜೆ (Bajra)",
+    "category": "Millets",
+    "quantity": 1800,
+    "qualityGrade": "B",
+    "harvestDate": "2026-07-06T00:00:00.000Z",
+    "location": "Ballari, Karnataka",
+    "district": "Ballari",
+    "village": "Kampli",
+    "listingMode": "buynow",
+    "price": 35,
+    "aiPriceRecommended": 32,
+    "imageUrl": "https://images.unsplash.com/photo-1600271886742-f049cd451bba?auto=format&fit=crop&w=600&q=80",
+    "images": [
+      "https://images.unsplash.com/photo-1600271886742-f049cd451bba?auto=format&fit=crop&w=600&q=80"
+    ],
+    "stockStatus": "in-stock",
+    "deliveryOption": "logistics-delivery",
+    "status": "available",
+    "analytics": {
+      "views": 64,
+      "ordersCount": 2,
+      "revenue": 7000
+    },
+    "description": "Pearl Millet (Sajje) grains, excellent winter nutrition source, sourced locally.",
+    "createdAt": "2026-07-12T05:33:59.685Z"
+  },
+  {
+    "_id": "crop_9",
+    "farmer": "user_farmer_2",
+    "name": "Foxtail Millet (Navane)",
+    "localName": "ನವಣೆ (Foxtail Millet)",
+    "category": "Millets",
+    "quantity": 900,
+    "qualityGrade": "A",
+    "harvestDate": "2026-07-10T00:00:00.000Z",
+    "location": "Dharwad, Karnataka",
+    "district": "Dharwad",
+    "village": "Navalgund",
+    "listingMode": "buynow",
+    "price": 75,
+    "aiPriceRecommended": 72,
+    "imageUrl": "https://images.unsplash.com/photo-1622484211148-717df3e4e976?auto=format&fit=crop&w=600&q=80",
+    "images": [
+      "https://images.unsplash.com/photo-1622484211148-717df3e4e976?auto=format&fit=crop&w=600&q=80"
+    ],
+    "stockStatus": "in-stock",
+    "deliveryOption": "logistics-delivery",
+    "status": "available",
+    "analytics": {
+      "views": 80,
+      "ordersCount": 1,
+      "revenue": 7500
+    },
+    "description": "Dehulled organic Foxtail Millet (Navane) loaded with vitamins and fibers.",
+    "createdAt": "2026-07-14T05:33:59.685Z"
+  },
+  {
+    "_id": "crop_10",
+    "farmer": "user_farmer_2",
+    "name": "Little Millet (Samai)",
+    "localName": "ಸಾಮೆ (Little Millet)",
+    "category": "Millets",
+    "quantity": 700,
+    "qualityGrade": "A",
+    "harvestDate": "2026-07-09T00:00:00.000Z",
+    "location": "Chikkamagaluru, Karnataka",
+    "district": "Chikkamagaluru",
+    "village": "Tarikere",
+    "listingMode": "buynow",
+    "price": 80,
+    "aiPriceRecommended": 78,
+    "imageUrl": "https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=600&q=80",
+    "images": [
+      "https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=600&q=80"
+    ],
+    "stockStatus": "in-stock",
+    "deliveryOption": "logistics-delivery",
+    "status": "available",
+    "analytics": {
+      "views": 45,
+      "ordersCount": 1,
+      "revenue": 8000
+    },
+    "description": "Tiny nutrient-rich little millet grains, sourced from rainfed farming systems.",
+    "createdAt": "2026-07-12T05:33:59.685Z"
+  },
+  {
+    "_id": "crop_11",
+    "farmer": "user_farmer_1",
+    "name": "Barnyard Millet (Oodalu)",
+    "localName": "ಊದಲು (Barnyard Millet)",
+    "category": "Millets",
+    "quantity": 600,
+    "qualityGrade": "B",
+    "harvestDate": "2026-07-13T00:00:00.000Z",
+    "location": "Chikkamagaluru, Karnataka",
+    "district": "Chikkamagaluru",
+    "village": "Kadur",
+    "listingMode": "buynow",
+    "price": 85,
+    "aiPriceRecommended": 82,
+    "imageUrl": "https://images.unsplash.com/photo-1615485290382-441e4d049cb5?auto=format&fit=crop&w=600&q=80",
+    "images": [
+      "https://images.unsplash.com/photo-1615485290382-441e4d049cb5?auto=format&fit=crop&w=600&q=80"
+    ],
+    "stockStatus": "in-stock",
+    "deliveryOption": "logistics-delivery",
+    "status": "available",
+    "analytics": {
+      "views": 52,
+      "ordersCount": 0,
+      "revenue": 0
+    },
+    "description": "Barnyard millet (Oodalu), low glycemic index health grain.",
+    "createdAt": "2026-07-16T05:33:59.685Z"
+  },
+  {
+    "_id": "crop_12",
+    "farmer": "user_farmer_1",
+    "name": "Kodo Millet (Harka)",
+    "localName": "ಹರಕ (Kodo Millet)",
+    "category": "Millets",
+    "quantity": 800,
+    "qualityGrade": "A",
+    "harvestDate": "2026-07-11T00:00:00.000Z",
+    "location": "Tumakuru, Karnataka",
+    "district": "Tumakuru",
+    "village": "Tiptur",
+    "listingMode": "buynow",
+    "price": 90,
+    "aiPriceRecommended": 88,
+    "imageUrl": "https://images.unsplash.com/photo-1536304997881-a372c179924b?auto=format&fit=crop&w=600&q=80",
+    "images": [
+      "https://images.unsplash.com/photo-1536304997881-a372c179924b?auto=format&fit=crop&w=600&q=80"
+    ],
+    "stockStatus": "in-stock",
+    "deliveryOption": "logistics-delivery",
+    "status": "available",
+    "analytics": {
+      "views": 68,
+      "ordersCount": 2,
+      "revenue": 18000
+    },
+    "description": "Kodo millets processed and dehulled. High antioxidant property grains.",
+    "createdAt": "2026-07-14T05:33:59.685Z"
+  },
+  {
+    "_id": "crop_13",
+    "farmer": "user_farmer_2",
+    "name": "Proso Millet (Baragu)",
+    "localName": "ಬರಗು (Proso Millet)",
+    "category": "Millets",
+    "quantity": 500,
+    "qualityGrade": "A",
+    "harvestDate": "2026-07-10T00:00:00.000Z",
+    "location": "Tumakuru, Karnataka",
+    "district": "Tumakuru",
+    "village": "Sira",
+    "listingMode": "buynow",
+    "price": 88,
+    "aiPriceRecommended": 85,
+    "imageUrl": "https://images.unsplash.com/photo-1543257580-7269da773bf5?auto=format&fit=crop&w=600&q=80",
+    "images": [
+      "https://images.unsplash.com/photo-1543257580-7269da773bf5?auto=format&fit=crop&w=600&q=80"
+    ],
+    "stockStatus": "in-stock",
+    "deliveryOption": "logistics-delivery",
+    "status": "available",
+    "analytics": {
+      "views": 35,
+      "ordersCount": 0,
+      "revenue": 0
+    },
+    "description": "Dehulled Proso millets, ideal for making porridge and grain mixes.",
+    "createdAt": "2026-07-15T05:33:59.685Z"
+  },
+  {
+    "_id": "crop_14",
+    "farmer": "user_farmer_2",
+    "name": "Premium Wheat Grains",
+    "localName": "ಗೋಧಿ (Wheat)",
+    "category": "Grains",
+    "quantity": 3500,
+    "qualityGrade": "Premium",
+    "harvestDate": "2026-07-07T00:00:00.000Z",
+    "location": "Belagavi, Karnataka",
+    "district": "Belagavi",
+    "village": "Athani",
+    "listingMode": "buynow",
+    "price": 32,
+    "aiPriceRecommended": 30,
+    "imageUrl": "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?auto=format&fit=crop&w=600&q=80",
+    "images": [
+      "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?auto=format&fit=crop&w=600&q=80"
+    ],
+    "stockStatus": "in-stock",
+    "deliveryOption": "logistics-delivery",
+    "status": "available",
+    "analytics": {
+      "views": 104,
+      "ordersCount": 1,
+      "revenue": 14000
+    },
+    "description": "Premium wheat grains harvested in black cotton soils of Athani region.",
+    "createdAt": "2026-07-11T05:33:59.685Z"
+  },
+  {
+    "_id": "crop_15",
+    "farmer": "user_farmer_1",
+    "name": "Golden Maize (Corn)",
+    "localName": "ಮೆಕ್ಕೆಜೋಳ (Maize)",
+    "category": "Grains",
+    "quantity": 4000,
+    "qualityGrade": "A",
+    "harvestDate": "2026-07-09T00:00:00.000Z",
+    "location": "Dharwad, Karnataka",
+    "district": "Dharwad",
+    "village": "Kalghatgi",
+    "listingMode": "buynow",
+    "price": 22,
+    "aiPriceRecommended": 20,
+    "imageUrl": "https://images.unsplash.com/photo-1551754655-cd27e38d2076?auto=format&fit=crop&w=600&q=80",
+    "images": [
+      "https://images.unsplash.com/photo-1551754655-cd27e38d2076?auto=format&fit=crop&w=600&q=80"
+    ],
+    "stockStatus": "in-stock",
+    "deliveryOption": "logistics-delivery",
+    "status": "available",
+    "analytics": {
+      "views": 82,
+      "ordersCount": 4,
+      "revenue": 17600
+    },
+    "description": "Hybrid feed maize grains, low moisture count, excellent quality.",
+    "createdAt": "2026-07-12T05:33:59.685Z"
+  },
+  {
+    "_id": "crop_16",
+    "farmer": "user_farmer_1",
+    "name": "Barley Grains (Jau)",
+    "localName": "ಯವ ಧಾನ್ಯ (Barley)",
+    "category": "Grains",
+    "quantity": 1500,
+    "qualityGrade": "B",
+    "harvestDate": "2026-07-12T00:00:00.000Z",
+    "location": "Belagavi, Karnataka",
+    "district": "Belagavi",
+    "village": "Savadatti",
+    "listingMode": "buynow",
+    "price": 40,
+    "aiPriceRecommended": 38,
+    "imageUrl": "https://images.unsplash.com/photo-1560089000-7433a4ebbd64?auto=format&fit=crop&w=600&q=80",
+    "images": [
+      "https://images.unsplash.com/photo-1560089000-7433a4ebbd64?auto=format&fit=crop&w=600&q=80"
+    ],
+    "stockStatus": "in-stock",
+    "deliveryOption": "logistics-delivery",
+    "status": "available",
+    "analytics": {
+      "views": 68,
+      "ordersCount": 1,
+      "revenue": 4000
+    },
+    "description": "Clean hull-less barley grains, great for milling flour or brewing inputs.",
+    "createdAt": "2026-07-14T05:33:59.685Z"
+  },
+  {
+    "_id": "crop_17",
+    "farmer": "user_farmer_2",
+    "name": "Steel-Cut Oats",
+    "localName": "ಓಟ್ಸ್ ಧಾನ್ಯ (Oats)",
+    "category": "Grains",
+    "quantity": 1000,
+    "qualityGrade": "A",
+    "harvestDate": "2026-07-06T00:00:00.000Z",
+    "location": "Mysuru, Karnataka",
+    "district": "Mysuru",
+    "village": "Hunsur",
+    "listingMode": "buynow",
+    "price": 110,
+    "aiPriceRecommended": 105,
+    "imageUrl": "https://images.unsplash.com/photo-1586444248902-2f64eddc13df?auto=format&fit=crop&w=600&q=80",
+    "images": [
+      "https://images.unsplash.com/photo-1586444248902-2f64eddc13df?auto=format&fit=crop&w=600&q=80"
+    ],
+    "stockStatus": "in-stock",
+    "deliveryOption": "logistics-delivery",
+    "status": "available",
+    "analytics": {
+      "views": 115,
+      "ordersCount": 4,
+      "revenue": 44000
+    },
+    "description": "Premium raw oat groats cut into steel bits, perfect for rich oatmeal breakfast bowls.",
+    "createdAt": "2026-07-10T05:33:59.685Z"
+  },
+  {
+    "_id": "crop_18",
+    "farmer": "user_farmer_1",
+    "name": "Green Gram (Hesaru Bele)",
+    "localName": "ಹೆಸರು ಬೇಳೆ (Green Gram)",
+    "category": "Pulses",
+    "quantity": 1200,
+    "qualityGrade": "A",
+    "harvestDate": "2026-07-13T00:00:00.000Z",
+    "location": "Dharwad, Karnataka",
+    "district": "Dharwad",
+    "village": "Hubli",
+    "listingMode": "buynow",
+    "price": 105,
+    "aiPriceRecommended": 100,
+    "imageUrl": "https://images.unsplash.com/photo-1603048588665-791ca8aea617?auto=format&fit=crop&w=600&q=80",
+    "images": [
+      "https://images.unsplash.com/photo-1603048588665-791ca8aea617?auto=format&fit=crop&w=600&q=80"
+    ],
+    "stockStatus": "in-stock",
+    "deliveryOption": "logistics-delivery",
+    "status": "available",
+    "analytics": {
+      "views": 90,
+      "ordersCount": 2,
+      "revenue": 21000
+    },
+    "description": "Nutritious green gram, split yellow skinless lentils of premium grade.",
+    "createdAt": "2026-07-16T05:33:59.685Z"
+  },
+  {
+    "_id": "crop_19",
+    "farmer": "user_farmer_1",
+    "name": "Black Gram (Uddina Bele)",
+    "localName": "ಉದ್ದಿನ ಬೇಳೆ (Black Gram)",
+    "category": "Pulses",
+    "quantity": 1000,
+    "qualityGrade": "A",
+    "harvestDate": "2026-07-11T00:00:00.000Z",
+    "location": "Mysuru, Karnataka",
+    "district": "Mysuru",
+    "village": "T Narasipura",
+    "listingMode": "buynow",
+    "price": 120,
+    "aiPriceRecommended": 115,
+    "imageUrl": "https://images.unsplash.com/photo-1599940824399-b87987ceb72a?auto=format&fit=crop&w=600&q=80",
+    "images": [
+      "https://images.unsplash.com/photo-1599940824399-b87987ceb72a?auto=format&fit=crop&w=600&q=80"
+    ],
+    "stockStatus": "in-stock",
+    "deliveryOption": "logistics-delivery",
+    "status": "available",
+    "analytics": {
+      "views": 80,
+      "ordersCount": 2,
+      "revenue": 24000
+    },
+    "description": "Split dehulled black gram, ideal for preparing batters.",
+    "createdAt": "2026-07-16T05:33:59.685Z"
+  },
+  {
+    "_id": "crop_20",
+    "farmer": "user_farmer_1",
+    "name": "Bengal Gram (Kadale Bele)",
+    "localName": "ಕಡಲೆ ಬೇಳೆ (Bengal Gram)",
+    "category": "Pulses",
+    "quantity": 1500,
+    "qualityGrade": "A",
+    "harvestDate": "2026-07-08T00:00:00.000Z",
+    "location": "Vijayapura, Karnataka",
+    "district": "Vijayapura",
+    "village": "Muddebihal",
+    "listingMode": "buynow",
+    "price": 78,
+    "aiPriceRecommended": 75,
+    "imageUrl": "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=600&q=80",
+    "images": [
+      "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=600&q=80"
+    ],
+    "stockStatus": "in-stock",
+    "deliveryOption": "logistics-delivery",
+    "status": "available",
+    "analytics": {
+      "views": 66,
+      "ordersCount": 2,
+      "revenue": 15600
+    },
+    "description": "Yellow split chickpeas, harvested in black soil fields.",
+    "createdAt": "2026-07-13T05:33:59.685Z"
+  },
+  {
+    "_id": "crop_21",
+    "farmer": "user_farmer_1",
+    "name": "Toor Dal (Togari Bele)",
+    "localName": "ತೊಗರಿ ಬೇಳೆ (Toor Dal)",
+    "category": "Pulses",
+    "quantity": 1200,
+    "qualityGrade": "Premium",
+    "harvestDate": "2026-07-09T00:00:00.000Z",
+    "location": "Vijayapura, Karnataka",
+    "district": "Vijayapura",
+    "village": "Sindagi",
+    "listingMode": "buynow",
+    "price": 135,
+    "aiPriceRecommended": 130,
+    "imageUrl": "https://images.unsplash.com/photo-1585994464166-51e600570b55?auto=format&fit=crop&w=600&q=80",
+    "images": [
+      "https://images.unsplash.com/photo-1585994464166-51e600570b55?auto=format&fit=crop&w=600&q=80"
+    ],
+    "stockStatus": "in-stock",
+    "deliveryOption": "logistics-delivery",
+    "status": "available",
+    "analytics": {
+      "views": 104,
+      "ordersCount": 4,
+      "revenue": 54000
+    },
+    "description": "Premium unpolished Togari Bele.",
+    "createdAt": "2026-07-14T05:33:59.685Z"
+  },
+  {
+    "_id": "crop_22",
+    "farmer": "user_farmer_1",
+    "name": "Horse Gram (Huruli)",
+    "localName": "ಹುರುಳಿ ಬೇಳೆ (Horse Gram)",
+    "category": "Pulses",
+    "quantity": 1000,
+    "qualityGrade": "A",
+    "harvestDate": "2026-07-06T00:00:00.000Z",
+    "location": "Hassan, Karnataka",
+    "district": "Hassan",
+    "village": "Holenarasipura",
+    "listingMode": "buynow",
+    "price": 60,
+    "aiPriceRecommended": 58,
+    "imageUrl": "https://images.unsplash.com/photo-1515942400420-2b98fed1f515?auto=format&fit=crop&w=600&q=80",
+    "images": [
+      "https://images.unsplash.com/photo-1515942400420-2b98fed1f515?auto=format&fit=crop&w=600&q=80"
+    ],
+    "stockStatus": "in-stock",
+    "deliveryOption": "logistics-delivery",
+    "status": "available",
+    "analytics": {
+      "views": 50,
+      "ordersCount": 1,
+      "revenue": 6000
+    },
+    "description": "Traditional protein-rich local horse gram, harvested organically.",
+    "createdAt": "2026-07-12T05:33:59.685Z"
+  },
+  {
+    "_id": "crop_23",
+    "farmer": "user_farmer_1",
+    "name": "Cowpea (Alasande)",
+    "localName": "ಅಲಸಂದೆ (Cowpea)",
+    "category": "Pulses",
+    "quantity": 800,
+    "qualityGrade": "A",
+    "harvestDate": "2026-07-09T00:00:00.000Z",
+    "location": "Tumakuru, Karnataka",
+    "district": "Tumakuru",
+    "village": "Gubbi",
+    "listingMode": "buynow",
+    "price": 72,
+    "aiPriceRecommended": 70,
+    "imageUrl": "https://images.unsplash.com/photo-1551248429-40975aa4de74?auto=format&fit=crop&w=600&q=80",
+    "images": [
+      "https://images.unsplash.com/photo-1551248429-40975aa4de74?auto=format&fit=crop&w=600&q=80"
+    ],
+    "stockStatus": "in-stock",
+    "deliveryOption": "logistics-delivery",
+    "status": "available",
+    "analytics": {
+      "views": 42,
+      "ordersCount": 0,
+      "revenue": 0
+    },
+    "description": "Traditional black-eyed peas, dry crop from Gubbi farms.",
+    "createdAt": "2026-07-14T05:33:59.685Z"
+  },
+  {
+    "_id": "crop_24",
+    "farmer": "user_farmer_1",
+    "name": "Premium Groundnuts",
+    "localName": "ಕಡಲೆಕಾಯಿ (Groundnut)",
+    "category": "Oil Seeds",
+    "quantity": 2000,
+    "qualityGrade": "Premium",
+    "harvestDate": "2026-07-05T00:00:00.000Z",
+    "location": "Tumakuru, Karnataka",
+    "district": "Tumakuru",
+    "village": "Gubbi",
+    "listingMode": "buynow",
+    "price": 90,
+    "aiPriceRecommended": 88,
+    "imageUrl": "https://images.unsplash.com/photo-1569562211093-4ed0d0758f12?auto=format&fit=crop&w=600&q=80",
+    "images": [
+      "https://images.unsplash.com/photo-1569562211093-4ed0d0758f12?auto=format&fit=crop&w=600&q=80"
+    ],
+    "stockStatus": "in-stock",
+    "deliveryOption": "logistics-delivery",
+    "status": "available",
+    "analytics": {
+      "views": 135,
+      "ordersCount": 5,
+      "revenue": 45000
+    },
+    "description": "Hand-selected bold groundnuts, ideal for oil press extraction.",
+    "createdAt": "2026-07-11T05:33:59.685Z"
+  },
+  {
+    "_id": "crop_25",
+    "farmer": "user_farmer_2",
+    "name": "Organic Sesame Seeds (Ellu)",
+    "localName": "ಎಳ್ಳು (Sesame Seeds)",
+    "category": "Oil Seeds",
+    "quantity": 800,
+    "qualityGrade": "A",
+    "harvestDate": "2026-07-09T00:00:00.000Z",
+    "location": "Hassan, Karnataka",
+    "district": "Hassan",
+    "village": "Channarayapatna",
+    "listingMode": "buynow",
+    "price": 160,
+    "aiPriceRecommended": 155,
+    "imageUrl": "https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?auto=format&fit=crop&w=600&q=80",
+    "images": [
+      "https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?auto=format&fit=crop&w=600&q=80"
+    ],
+    "stockStatus": "in-stock",
+    "deliveryOption": "logistics-delivery",
+    "status": "available",
+    "analytics": {
+      "views": 72,
+      "ordersCount": 1,
+      "revenue": 16000
+    },
+    "description": "Cleaned white sesame seeds, rich in flavor, harvested traditionally.",
+    "createdAt": "2026-07-14T05:33:59.685Z"
+  },
+  {
+    "_id": "crop_26",
+    "farmer": "user_farmer_1",
+    "name": "Sunflower Seeds",
+    "localName": "ಸೂರ್ಯಕಾಂತಿ ಬಿತ್ತನೆ (Sunflower)",
+    "category": "Oil Seeds",
+    "quantity": 1200,
+    "qualityGrade": "A",
+    "harvestDate": "2026-07-10T00:00:00.000Z",
+    "location": "Ballari, Karnataka",
+    "district": "Ballari",
+    "village": "Kampli",
+    "listingMode": "buynow",
+    "price": 85,
+    "aiPriceRecommended": 80,
+    "imageUrl": "https://images.unsplash.com/photo-1597848212624-a19eb35e2651?auto=format&fit=crop&w=600&q=80",
+    "images": [
+      "https://images.unsplash.com/photo-1597848212624-a19eb35e2651?auto=format&fit=crop&w=600&q=80"
+    ],
+    "stockStatus": "in-stock",
+    "deliveryOption": "logistics-delivery",
+    "status": "available",
+    "analytics": {
+      "views": 90,
+      "ordersCount": 3,
+      "revenue": 25500
+    },
+    "description": "Oil-rich hybrid sunflower seeds, dry-processed for oil mills.",
+    "createdAt": "2026-07-15T05:33:59.685Z"
+  },
+  {
+    "_id": "crop_27",
+    "farmer": "user_farmer_2",
+    "name": "Castor Seeds (Haralu)",
+    "localName": "ಹರಳೆಣ್ಣೆ ಬೀಜ (Castor)",
+    "category": "Oil Seeds",
+    "quantity": 1000,
+    "qualityGrade": "A",
+    "harvestDate": "2026-07-06T00:00:00.000Z",
+    "location": "Mysuru, Karnataka",
+    "district": "Mysuru",
+    "village": "Nanjangud",
+    "listingMode": "buynow",
+    "price": 68,
+    "aiPriceRecommended": 65,
+    "imageUrl": "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?auto=format&fit=crop&w=600&q=80",
+    "images": [
+      "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?auto=format&fit=crop&w=600&q=80"
+    ],
+    "stockStatus": "in-stock",
+    "deliveryOption": "logistics-delivery",
+    "status": "available",
+    "analytics": {
+      "views": 50,
+      "ordersCount": 1,
+      "revenue": 6800
+    },
+    "description": "High-grade castor oil seeds harvested from Nanjangud drylands.",
+    "createdAt": "2026-07-10T05:33:59.685Z"
+  },
+  {
+    "_id": "crop_28",
+    "farmer": "user_farmer_1",
+    "name": "Arecanut (Supari Grains)",
+    "localName": "ಅಡಿಕೆ (Arecanut)",
+    "category": "Commercial Crops",
+    "quantity": 1500,
+    "qualityGrade": "Premium",
+    "harvestDate": "2026-07-03T00:00:00.000Z",
+    "location": "Chikkamagaluru, Karnataka",
+    "district": "Chikkamagaluru",
+    "village": "Koppa",
+    "listingMode": "buynow",
+    "price": 460,
+    "aiPriceRecommended": 450,
+    "imageUrl": "https://images.unsplash.com/photo-1500937386664-56d159062255?auto=format&fit=crop&w=600&q=80",
+    "images": [
+      "https://images.unsplash.com/photo-1500937386664-56d159062255?auto=format&fit=crop&w=600&q=80"
+    ],
+    "stockStatus": "in-stock",
+    "deliveryOption": "logistics-delivery",
+    "status": "available",
+    "analytics": {
+      "views": 420,
+      "ordersCount": 8,
+      "revenue": 368000
+    },
+    "description": "Sun-dried de-husked arecanut (adike) from high-altitude Malnad plantations.",
+    "createdAt": "2026-07-08T05:33:59.685Z"
+  },
+  {
+    "_id": "crop_29",
+    "farmer": "user_farmer_1",
+    "name": "Matured Desi Coconuts",
+    "localName": "ತೆಂಗಿನಕಾಯಿ (Coconut)",
+    "category": "Commercial Crops",
+    "quantity": 5000,
+    "qualityGrade": "A",
+    "harvestDate": "2026-07-12T00:00:00.000Z",
+    "location": "Hassan, Karnataka",
+    "district": "Hassan",
+    "village": "Arasikere",
+    "listingMode": "buynow",
+    "price": 18,
+    "aiPriceRecommended": 17,
+    "imageUrl": "https://images.unsplash.com/photo-1587049352846-4a222e784d38?auto=format&fit=crop&w=600&q=80",
+    "images": [
+      "https://images.unsplash.com/photo-1587049352846-4a222e784d38?auto=format&fit=crop&w=600&q=80"
+    ],
+    "stockStatus": "in-stock",
+    "deliveryOption": "logistics-delivery",
+    "status": "available",
+    "analytics": {
+      "views": 145,
+      "ordersCount": 3,
+      "revenue": 54000
+    },
+    "description": "Matured Hassan coconuts, high water and copra thickness.",
+    "createdAt": "2026-07-14T05:33:59.685Z"
+  },
+  {
+    "_id": "crop_30",
+    "farmer": "user_farmer_1",
+    "name": "Raw Sugarcane Stalks",
+    "localName": "ಕಬ್ಬು (Sugarcane)",
+    "category": "Commercial Crops",
+    "quantity": 8000,
+    "qualityGrade": "A",
+    "harvestDate": "2026-07-15T00:00:00.000Z",
+    "location": "Mandya, Karnataka",
+    "district": "Mandya",
+    "village": "Maddur",
+    "listingMode": "buynow",
+    "price": 3,
+    "aiPriceRecommended": 2.8,
+    "imageUrl": "https://images.unsplash.com/photo-1592982537447-6f2a6a0c8188?auto=format&fit=crop&w=600&q=80",
+    "images": [
+      "https://images.unsplash.com/photo-1592982537447-6f2a6a0c8188?auto=format&fit=crop&w=600&q=80"
+    ],
+    "stockStatus": "in-stock",
+    "deliveryOption": "farm-pickup",
+    "status": "available",
+    "analytics": {
+      "views": 180,
+      "ordersCount": 2,
+      "revenue": 24000
+    },
+    "description": "Fresh juice-rich sugarcane stalks, ideal for jaggery processing mills.",
+    "createdAt": "2026-07-17T17:33:59.685Z"
+  },
+  {
+    "_id": "crop_31",
+    "farmer": "user_farmer_2",
+    "name": "BT Cotton Bolls",
+    "localName": "ಹತ್ತಿ (Cotton)",
+    "category": "Commercial Crops",
+    "quantity": 3000,
+    "qualityGrade": "A",
+    "harvestDate": "2026-07-11T00:00:00.000Z",
+    "location": "Dharwad, Karnataka",
+    "district": "Dharwad",
+    "village": "Hubli Rural",
+    "listingMode": "buynow",
+    "price": 68,
+    "aiPriceRecommended": 65,
+    "imageUrl": "https://images.unsplash.com/photo-1594614271360-0ed9a570ae15?auto=format&fit=crop&w=600&q=80",
+    "images": [
+      "https://images.unsplash.com/photo-1594614271360-0ed9a570ae15?auto=format&fit=crop&w=600&q=80"
+    ],
+    "stockStatus": "in-stock",
+    "deliveryOption": "logistics-delivery",
+    "status": "available",
+    "analytics": {
+      "views": 90,
+      "ordersCount": 0,
+      "revenue": 0
+    },
+    "description": "Pure white BT cotton bolls, hand-plucked, ideal for spinning mills.",
+    "createdAt": "2026-07-15T05:33:59.685Z"
+  },
+  {
+    "_id": "crop_32",
+    "farmer": "user_farmer_2",
+    "name": "Organic Turmeric Rhizomes",
+    "localName": "ಅರಿಶಿನ (Turmeric)",
+    "category": "Commercial Crops",
+    "quantity": 1200,
+    "qualityGrade": "Premium",
+    "harvestDate": "2026-07-09T00:00:00.000Z",
+    "location": "Chikkamagaluru, Karnataka",
+    "district": "Chikkamagaluru",
+    "village": "Tarikere",
+    "listingMode": "buynow",
+    "price": 140,
+    "aiPriceRecommended": 135,
+    "imageUrl": "https://images.unsplash.com/photo-1615485290382-441e4d049cb5?auto=format&fit=crop&w=600&q=80",
+    "images": [
+      "https://images.unsplash.com/photo-1615485290382-441e4d049cb5?auto=format&fit=crop&w=600&q=80"
+    ],
+    "stockStatus": "in-stock",
+    "deliveryOption": "logistics-delivery",
+    "status": "available",
+    "analytics": {
+      "views": 98,
+      "ordersCount": 2,
+      "revenue": 28000
+    },
+    "description": "High curcumin finger turmeric roots, sun-dried, premium grade.",
+    "createdAt": "2026-07-14T05:33:59.685Z"
+  },
+  {
+    "_id": "crop_33",
+    "farmer": "user_farmer_2",
+    "name": "Fresh Sakleshpur Ginger",
+    "localName": "ಶುಂಠಿ (Ginger)",
+    "category": "Commercial Crops",
+    "quantity": 1000,
+    "qualityGrade": "A",
+    "harvestDate": "2026-07-10T00:00:00.000Z",
+    "location": "Hassan, Karnataka",
+    "district": "Hassan",
+    "village": "Sakleshpur",
+    "listingMode": "buynow",
+    "price": 90,
+    "aiPriceRecommended": 85,
+    "imageUrl": "https://images.unsplash.com/photo-1599934254399-b87987ceb72a?auto=format&fit=crop&w=600&q=80",
+    "images": [
+      "https://images.unsplash.com/photo-1599934254399-b87987ceb72a?auto=format&fit=crop&w=600&q=80"
+    ],
+    "stockStatus": "in-stock",
+    "deliveryOption": "logistics-delivery",
+    "status": "available",
+    "analytics": {
+      "views": 84,
+      "ordersCount": 1,
+      "revenue": 9000
+    },
+    "description": "Freshly harvested aromatic ginger roots, high moisture, punchy flavour.",
+    "createdAt": "2026-07-15T05:33:59.685Z"
+  },
+  {
+    "_id": "crop_34",
+    "farmer": "user_farmer_1",
+    "name": "Dry Malnad Black Pepper",
+    "localName": "ಕರಿಮೆಣಸು (Black Pepper)",
+    "category": "Spices",
+    "quantity": 500,
+    "qualityGrade": "Premium",
+    "harvestDate": "2026-07-06T00:00:00.000Z",
+    "location": "Shivamogga, Karnataka",
+    "district": "Shivamogga",
+    "village": "Sagar",
+    "listingMode": "buynow",
+    "price": 480,
+    "aiPriceRecommended": 475,
+    "imageUrl": "https://images.unsplash.com/photo-1508746829417-e6f548d8d6ed?auto=format&fit=crop&w=600&q=80",
+    "images": [
+      "https://images.unsplash.com/photo-1508746829417-e6f548d8d6ed?auto=format&fit=crop&w=600&q=80"
+    ],
+    "stockStatus": "in-stock",
+    "deliveryOption": "logistics-delivery",
+    "status": "available",
+    "analytics": {
+      "views": 198,
+      "ordersCount": 6,
+      "revenue": 144000
+    },
+    "description": "Sun-dried black pepper from Malnad spices estates, ready for trade.",
+    "createdAt": "2026-07-12T05:33:59.685Z"
+  },
+  {
+    "_id": "crop_35",
+    "farmer": "user_farmer_1",
+    "name": "Green Cardamom (Elakki)",
+    "localName": "ಏಲಕ್ಕಿ (Cardamom)",
+    "category": "Spices",
+    "quantity": 300,
+    "qualityGrade": "Premium",
+    "harvestDate": "2026-07-08T00:00:00.000Z",
+    "location": "Chikkamagaluru, Karnataka",
+    "district": "Chikkamagaluru",
+    "village": "Mudigere",
+    "listingMode": "buynow",
+    "price": 1800,
+    "aiPriceRecommended": 1750,
+    "imageUrl": "https://images.unsplash.com/photo-1544982503-9f984c14501a?auto=format&fit=crop&w=600&q=80",
+    "images": [
+      "https://images.unsplash.com/photo-1544982503-9f984c14501a?auto=format&fit=crop&w=600&q=80"
+    ],
+    "stockStatus": "in-stock",
+    "deliveryOption": "logistics-delivery",
+    "status": "available",
+    "analytics": {
+      "views": 240,
+      "ordersCount": 4,
+      "revenue": 720000
+    },
+    "description": "7.5mm+ bold green cardamom capsules, rich aroma from Mudigere forests.",
+    "createdAt": "2026-07-13T05:33:59.685Z"
+  }
+]

@@ -1,0 +1,55 @@
+[
+  {
+    "_id": "user_farmer_1",
+    "name": "Basappa Gowda",
+    "email": "farmer1@agri.com",
+    "role": "farmer",
+    "location": "Mandya, Karnataka",
+    "isVerified": true,
+    "smartFarmingScore": {
+      "overallScore": 4.8,
+      "ratingsCount": 15
+    },
+    "hasTrustedBadge": true,
+    "walletBalance": 25000,
+    "password": "$2a$10$H95EkZZzc/qqYg3qhisvYeUyPgi9mNQFrfjlFu4MAsoySM9.t8v6W"
+  },
+  {
+    "_id": "user_farmer_2",
+    "name": "Malleshappa Belagavi",
+    "email": "farmer2@agri.com",
+    "role": "farmer",
+    "location": "Nashik, Maharashtra",
+    "isVerified": true,
+    "smartFarmingScore": {
+      "overallScore": 4.2,
+      "ratingsCount": 8
+    },
+    "hasTrustedBadge": false,
+    "walletBalance": 12000,
+    "password": "$2a$10$H95EkZZzc/qqYg3qhisvYeUyPgi9mNQFrfjlFu4MAsoySM9.t8v6W"
+  },
+  {
+    "_id": "user_buyer_1",
+    "name": "Ramesh Kumar (Retailer)",
+    "email": "buyer1@agri.com",
+    "role": "buyer",
+    "location": "Bengaluru, Karnataka",
+    "isVerified": true,
+    "walletBalance": 85000,
+    "favoriteFarmers": [
+      "user_farmer_1"
+    ],
+    "password": "$2a$10$H95EkZZzc/qqYg3qhisvYeUyPgi9mNQFrfjlFu4MAsoySM9.t8v6W"
+  },
+  {
+    "_id": "user_admin_1",
+    "name": "Agri Expert Admin",
+    "email": "admin@agri.com",
+    "role": "admin",
+    "location": "Bengaluru, Karnataka",
+    "isVerified": true,
+    "walletBalance": 0,
+    "password": "$2a$10$H95EkZZzc/qqYg3qhisvYeUyPgi9mNQFrfjlFu4MAsoySM9.t8v6W"
+  }
+]
