@@ -9,6 +9,7 @@ const Order = require('../models/Order');
 const ForumPost = require('../models/ForumPost');
 const Review = require('../models/Review');
 const Question = require('../models/Question');
+const Negotiation = require('../models/Negotiation');
 const { getImageForCrop } = require('./cropImages');
 
 // Simple local JSON db helpers
@@ -52,6 +53,7 @@ const seedUsers = [
     location: "Mandya, Karnataka",
     isVerified: true,
     smartFarmingScore: { overallScore: 4.8, ratingsCount: 15 },
+    avatarUrl: "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=300&q=80",
     hasTrustedBadge: true,
     walletBalance: 25000
   },
@@ -63,6 +65,7 @@ const seedUsers = [
     location: "Nashik, Maharashtra",
     isVerified: true,
     smartFarmingScore: { overallScore: 4.2, ratingsCount: 8 },
+    avatarUrl: "https://images.unsplash.com/photo-1566385278603-755fa0c3453b?auto=format&fit=crop&w=300&q=80",
     hasTrustedBadge: false,
     walletBalance: 12000
   },
@@ -73,6 +76,7 @@ const seedUsers = [
     role: "buyer",
     location: "Bengaluru, Karnataka",
     isVerified: true,
+    avatarUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=80",
     walletBalance: 85000,
     favoriteFarmers: ["user_farmer_1"]
   },
@@ -83,6 +87,7 @@ const seedUsers = [
     role: "admin",
     location: "Bengaluru, Karnataka",
     isVerified: true,
+    avatarUrl: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=300&q=80",
     walletBalance: 0
   }
 ];
@@ -1040,7 +1045,12 @@ const seedAllData = async () => {
         await User.insertMany(usersToInsert);
         const cropsToInsert = seedCrops.map(c => {
           const img = getImageForCrop(c.name);
-          return { ...c, imageUrl: img, images: [img] };
+          return { 
+            ...c, 
+            imageUrl: img, 
+            images: [img],
+            minPriceAcceptable: c.minPriceAcceptable || Math.round(c.price * 0.8)
+          };
         });
         await Crop.insertMany(cropsToInsert);
         await Auction.insertMany(seedAuctions);
@@ -1060,7 +1070,12 @@ const seedAllData = async () => {
       writeJson('users', usersToInsert);
       const cropsToInsert = seedCrops.map(c => {
         const img = getImageForCrop(c.name);
-        return { ...c, imageUrl: img, images: [img] };
+        return { 
+          ...c, 
+          imageUrl: img, 
+          images: [img],
+          minPriceAcceptable: c.minPriceAcceptable || Math.round(c.price * 0.8)
+        };
       });
       writeJson('crops', cropsToInsert);
       writeJson('auctions', seedAuctions);
@@ -1128,7 +1143,7 @@ const dbManager = {
 
   crops: {
     find: async (query = {}) => {
-      if (!db.useLocalMock()) return await Crop.find(query).populate('farmer', 'name isVerified smartFarmingScore hasTrustedBadge');
+      if (!db.useLocalMock()) return await Crop.find(query).populate('farmer', 'name isVerified smartFarmingScore hasTrustedBadge avatarUrl');
       let data = readJson('crops');
       let users = readJson('users');
       
@@ -1160,7 +1175,7 @@ const dbManager = {
 
       // Populate farmer details
       return filtered.map(crop => {
-        const farmerObj = users.find(u => u._id === crop.farmer) || { name: 'Unknown Farmer', smartFarmingScore: { overallScore: 4.5 }, hasTrustedBadge: false };
+        const farmerObj = users.find(u => u._id === crop.farmer) || { name: 'Unknown Farmer', smartFarmingScore: { overallScore: 4.5 }, hasTrustedBadge: false, avatarUrl: '' };
         return {
           ...crop,
           farmer: {
@@ -1168,13 +1183,14 @@ const dbManager = {
             name: farmerObj.name,
             isVerified: farmerObj.isVerified,
             smartFarmingScore: farmerObj.smartFarmingScore,
-            hasTrustedBadge: farmerObj.hasTrustedBadge
+            hasTrustedBadge: farmerObj.hasTrustedBadge,
+            avatarUrl: farmerObj.avatarUrl || ''
           }
         };
       });
     },
     findOne: async (query) => {
-      if (!db.useLocalMock()) return await Crop.findOne(query).populate('farmer', 'name isVerified smartFarmingScore hasTrustedBadge');
+      if (!db.useLocalMock()) return await Crop.findOne(query).populate('farmer', 'name isVerified smartFarmingScore hasTrustedBadge avatarUrl');
       let data = readJson('crops');
       let crop = data.find(item => {
         for (let k in query) {
@@ -1184,7 +1200,7 @@ const dbManager = {
       });
       if (!crop) return null;
       let users = readJson('users');
-      const farmerObj = users.find(u => u._id === crop.farmer) || { name: 'Unknown Farmer', smartFarmingScore: { overallScore: 4.5 }, hasTrustedBadge: false };
+      const farmerObj = users.find(u => u._id === crop.farmer) || { name: 'Unknown Farmer', smartFarmingScore: { overallScore: 4.5 }, hasTrustedBadge: false, avatarUrl: '' };
       return {
         ...crop,
         farmer: {
@@ -1192,17 +1208,18 @@ const dbManager = {
           name: farmerObj.name,
           isVerified: farmerObj.isVerified,
           smartFarmingScore: farmerObj.smartFarmingScore,
-          hasTrustedBadge: farmerObj.hasTrustedBadge
+          hasTrustedBadge: farmerObj.hasTrustedBadge,
+          avatarUrl: farmerObj.avatarUrl || ''
         }
       };
     },
     findById: async (id) => {
-      if (!db.useLocalMock()) return await Crop.findById(id).populate('farmer', 'name isVerified smartFarmingScore hasTrustedBadge');
+      if (!db.useLocalMock()) return await Crop.findById(id).populate('farmer', 'name isVerified smartFarmingScore hasTrustedBadge avatarUrl');
       let data = readJson('crops');
       let crop = data.find(item => item._id === id);
       if (!crop) return null;
       let users = readJson('users');
-      const farmerObj = users.find(u => u._id === crop.farmer) || { name: 'Unknown Farmer', smartFarmingScore: { overallScore: 4.5 }, hasTrustedBadge: false };
+      const farmerObj = users.find(u => u._id === crop.farmer) || { name: 'Unknown Farmer', smartFarmingScore: { overallScore: 4.5 }, hasTrustedBadge: false, avatarUrl: '' };
       return {
         ...crop,
         farmer: {
@@ -1210,7 +1227,8 @@ const dbManager = {
           name: farmerObj.name,
           isVerified: farmerObj.isVerified,
           smartFarmingScore: farmerObj.smartFarmingScore,
-          hasTrustedBadge: farmerObj.hasTrustedBadge
+          hasTrustedBadge: farmerObj.hasTrustedBadge,
+          avatarUrl: farmerObj.avatarUrl || ''
         }
       };
     },
@@ -1481,6 +1499,55 @@ const dbManager = {
       const updatedItem = { ...posts[index], ...update };
       posts[index] = updatedItem;
       writeJson('forum_posts', posts);
+      return updatedItem;
+    }
+  },
+
+  negotiations: {
+    find: async (query = {}) => {
+      if (!db.useLocalMock()) return await Negotiation.find(query);
+      let data = readJson('negotiations');
+      return data.filter(item => {
+        for (let k in query) {
+          if (item[k] !== query[k]) return false;
+        }
+        return true;
+      });
+    },
+    findById: async (id) => {
+      if (!db.useLocalMock()) return await Negotiation.findById(id).populate('crop').populate('buyer', 'name').populate('seller', 'name');
+      let data = readJson('negotiations');
+      return data.find(item => item._id === id) || null;
+    },
+    create: async (doc) => {
+      if (!db.useLocalMock()) return await Negotiation.create(doc);
+      let data = readJson('negotiations');
+      const newDoc = { 
+        _id: generateId(), 
+        ...doc, 
+        messages: doc.messages || [],
+        createdAt: new Date().toISOString() 
+      };
+      data.push(newDoc);
+      writeJson('negotiations', data);
+      return newDoc;
+    },
+    findByIdAndUpdate: async (id, update) => {
+      if (!db.useLocalMock()) return await Negotiation.findByIdAndUpdate(id, update, { new: true });
+      let data = readJson('negotiations');
+      let index = data.findIndex(item => item._id === id);
+      if (index === -1) return null;
+      
+      let updatedItem = { ...data[index] };
+      if (update.$push && update.$push.messages) {
+        updatedItem.messages = updatedItem.messages || [];
+        updatedItem.messages.push({ _id: generateId(), ...update.$push.messages, createdAt: new Date().toISOString() });
+      } else {
+        Object.assign(updatedItem, update);
+      }
+      
+      data[index] = updatedItem;
+      writeJson('negotiations', data);
       return updatedItem;
     }
   },

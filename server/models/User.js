@@ -46,6 +46,10 @@ const UserSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
+  avatarUrl: {
+    type: String,
+    default: ''
+  },
   favoriteFarmers: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User'

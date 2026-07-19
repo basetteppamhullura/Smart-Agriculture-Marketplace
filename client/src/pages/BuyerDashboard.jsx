@@ -2,15 +2,30 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useThemeLanguage } from '../context/ThemeLanguageContext';
 import ProductReviewsSection from '../components/ProductReviewsSection';
+import NegotiationModal from '../components/NegotiationModal';
+import BargainingHub from '../components/BargainingHub';
 import { Search, MapPin, Award, Calendar, DollarSign, Heart, ShoppingBag, Bell, Star, Navigation, Clock, Truck, ChevronRight } from 'lucide-react';
 
-export default function BuyerDashboard() {
+export default function BuyerDashboard({ actionPayload, clearActionPayload }) {
   const { user, toggleFavorite, apiUrl } = useAuth();
   const { t } = useThemeLanguage();
 
   const [activeSubTab, setActiveSubTab] = useState('browse'); // 'browse' | 'orders' | 'subscriptions' | 'favorites'
   const [crops, setCrops] = useState([]);
   const [orders, setOrders] = useState([]);
+
+  useEffect(() => {
+    if (actionPayload && actionPayload.crop) {
+      // Find exact match in our loaded crop list
+      const matchedCrop = crops.find(c => c._id === actionPayload.crop._id) || actionPayload.crop;
+      if (actionPayload.action === 'buy') {
+        setSelectedCrop(matchedCrop);
+      } else if (actionPayload.action === 'negotiate') {
+        setNegotiatingCrop(matchedCrop);
+      }
+      clearActionPayload();
+    }
+  }, [actionPayload, crops]);
   const [loading, setLoading] = useState(true);
 
   // Search & Filter
@@ -22,6 +37,7 @@ export default function BuyerDashboard() {
 
   // Transaction modals states
   const [selectedCrop, setSelectedCrop] = useState(null);
+  const [negotiatingCrop, setNegotiatingCrop] = useState(null);
   const [checkoutQty, setCheckoutQty] = useState('');
   const [bidAmount, setBidAmount] = useState('');
   const [isSubscription, setIsSubscription] = useState(false);
@@ -243,6 +259,16 @@ export default function BuyerDashboard() {
           Purchases & Shipments tracking
         </button>
         <button
+          onClick={() => setActiveSubTab('bargains')}
+          style={{
+            ...styles.subTabBtn,
+            backgroundColor: activeSubTab === 'bargains' ? 'var(--forest-green)' : 'transparent',
+            color: activeSubTab === 'bargains' ? 'white' : 'var(--text-secondary)'
+          }}
+        >
+          Active Bargains
+        </button>
+        <button
           onClick={() => setActiveSubTab('subscriptions')}
           style={{
             ...styles.subTabBtn,
@@ -349,14 +375,36 @@ export default function BuyerDashboard() {
                         </span>
                         <strong style={{ fontSize: '18px' }}>Rs {crop.price} / unit</strong>
                       </div>
-                      <button 
-                        onClick={() => setSelectedCrop(crop)}
-                        className="btn btn-primary"
-                        style={{ padding: '8px 16px', fontSize: '12px' }}
-                        disabled={isSoldOut}
-                      >
-                        {isSoldOut ? 'Sold Out' : crop.listingMode === 'auction' ? 'Place Bid' : 'Checkout'}
-                      </button>
+                      
+                      {crop.listingMode === 'buynow' ? (
+                        <div style={{ display: 'flex', gap: '6px' }}>
+                          <button 
+                            onClick={() => setSelectedCrop(crop)}
+                            className="btn btn-primary"
+                            style={{ padding: '6px 12px', fontSize: '11px' }}
+                            disabled={isSoldOut}
+                          >
+                            Buy Now
+                          </button>
+                          <button 
+                            onClick={() => setNegotiatingCrop(crop)}
+                            className="btn btn-outline"
+                            style={{ padding: '6px 12px', fontSize: '11px', borderColor: 'var(--amber-gold)', color: 'var(--amber-gold)' }}
+                            disabled={isSoldOut}
+                          >
+                            Negotiate
+                          </button>
+                        </div>
+                      ) : (
+                        <button 
+                          onClick={() => setSelectedCrop(crop)}
+                          className="btn btn-primary"
+                          style={{ padding: '8px 16px', fontSize: '12px' }}
+                          disabled={isSoldOut}
+                        >
+                          Place Bid
+                        </button>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -493,6 +541,12 @@ export default function BuyerDashboard() {
         </div>
       )}
 
+      {activeSubTab === 'bargains' && (
+        <div style={styles.tabContent} className="fade-in">
+          <BargainingHub />
+        </div>
+      )}
+
       {/* CHECKOUT MODAL (Buy now or Bid with Multi-image carousel) */}
       {selectedCrop && (
         <div className="modal-overlay" onClick={() => setSelectedCrop(null)}>
@@ -596,6 +650,16 @@ export default function BuyerDashboard() {
             <ProductReviewsSection cropId={selectedCrop._id} />
           </div>
         </div>
+      )}
+
+      {negotiatingCrop && (
+        <NegotiationModal 
+          crop={negotiatingCrop} 
+          onClose={() => setNegotiatingCrop(null)} 
+          onSuccess={() => {
+            setActiveSubTab('bargains');
+          }}
+        />
       )}
 
       {/* FEEDBACK REVIEW MODAL */}

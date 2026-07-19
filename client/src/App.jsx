@@ -16,24 +16,59 @@ import CommunityForum from './pages/CommunityForum';
 import LogisticsHub from './pages/LogisticsHub';
 import FinancialTools from './pages/FinancialTools';
 import InfoHub from './pages/InfoHub';
+import AiValuationPage from './pages/AiValuationPage';
+import ReputationDashboard from './pages/ReputationDashboard';
 
 function MainAppContent() {
   const { user } = useAuth();
   const { t } = useThemeLanguage();
   const [currentTab, setCurrentTab] = useState('home');
   const [isWalletOpen, setIsWalletOpen] = useState(false);
+  const [buyerDashboardAction, setBuyerDashboardAction] = useState(null);
+  const [authInitialTab, setAuthInitialTab] = useState('login');
+  const [authInitialRole, setAuthInitialRole] = useState('buyer');
 
   // Router matching active tab to page component
   const renderActivePage = () => {
     switch (currentTab) {
       case 'home':
-        return <Home onChangeTab={setCurrentTab} />;
+        return (
+          <Home 
+            onChangeTab={(tab, payload) => {
+              if (tab === 'dashboard' && payload) {
+                setBuyerDashboardAction(payload);
+              }
+              if (tab === 'login' && payload) {
+                setAuthInitialTab(payload.tab || 'login');
+                setAuthInitialRole(payload.role || 'buyer');
+              }
+              setCurrentTab(tab);
+            }} 
+          />
+        );
       case 'login':
-        return <LoginRegister onAuthSuccess={() => setCurrentTab('dashboard')} />;
+        return (
+          <LoginRegister 
+            initialTab={authInitialTab}
+            initialRole={authInitialRole}
+            onAuthSuccess={() => setCurrentTab('dashboard')} 
+          />
+        );
       case 'dashboard':
-        if (!user) return <LoginRegister onAuthSuccess={() => setCurrentTab('dashboard')} />;
+        if (!user) return (
+          <LoginRegister 
+            initialTab={authInitialTab}
+            initialRole={authInitialRole}
+            onAuthSuccess={() => setCurrentTab('dashboard')} 
+          />
+        );
         if (user.role === 'farmer') return <FarmerDashboard />;
-        if (user.role === 'buyer') return <BuyerDashboard />;
+        if (user.role === 'buyer') return (
+          <BuyerDashboard 
+            actionPayload={buyerDashboardAction} 
+            clearActionPayload={() => setBuyerDashboardAction(null)} 
+          />
+        );
         if (user.role === 'admin') return <AdminDashboard />;
         return <div style={{ padding: '20px' }}>Dashboard type not supported.</div>;
       case 'forum':
@@ -44,6 +79,10 @@ function MainAppContent() {
         return <FinancialTools />;
       case 'infohub':
         return <InfoHub />;
+      case 'aivaluation':
+        return <AiValuationPage />;
+      case 'reputation':
+        return <ReputationDashboard />;
       default:
         return <Home onChangeTab={setCurrentTab} />;
     }

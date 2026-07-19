@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useThemeLanguage } from '../context/ThemeLanguageContext';
 import { useAuth } from '../context/AuthContext';
-import { Search, MapPin, Award, Calendar, ChevronRight, Eye, Star, Landmark, TrendingUp, ShieldCheck, Filter, Sprout } from 'lucide-react';
+import { Search, MapPin, Award, Calendar, ChevronRight, Eye, Star, Landmark, TrendingUp, ShieldCheck, Filter, Sprout, ShoppingBag } from 'lucide-react';
 
 export default function Home({ onChangeTab }) {
   const { t, language } = useThemeLanguage();
@@ -11,15 +11,21 @@ export default function Home({ onChangeTab }) {
   const [allCrops, setAllCrops] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Scope states: 'all' | 'karnataka'
-  const [scope, setScope] = useState('all');
-
   // Pagination & Filtering states
   const [visibleCount, setVisibleCount] = useState(8);
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('');
   const [sortBy, setSortBy] = useState('newest');
-  const [selectedDistrict, setSelectedDistrict] = useState('');
+  const [scrollY, setScrollY] = useState(0);
+
+  // Parallax Scroll Listener
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrollY(window.scrollY);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   // Load all showcase products
   useEffect(() => {
@@ -42,7 +48,7 @@ export default function Home({ onChangeTab }) {
   // Reset pagination on filters change
   useEffect(() => {
     setVisibleCount(8);
-  }, [scope, search, category, sortBy, selectedDistrict]);
+  }, [search, category, sortBy]);
 
   // Category tags
   const indiaCategories = [
@@ -51,29 +57,10 @@ export default function Home({ onChangeTab }) {
     'Agricultural equipment', 'Fertilizers', 'Other farm-related products'
   ];
 
-  const karnatakaCategories = [
-    'Rice', 'Millets', 'Pulses', 'Oil Seeds', 'Commercial Crops'
-  ];
-
-  const karnatakaDistricts = [
-    'Mandya', 'Mysuru', 'Hassan', 'Belagavi', 'Dharwad', 
-    'Shivamogga', 'Tumakuru', 'Vijayapura', 'Ballari', 'Chikkamagaluru'
-  ];
-
   // Filtering & Sorting calculations
   const filteredCrops = allCrops
     .filter(crop => {
-      // 1. Regional Scope filter
-      if (scope === 'karnataka') {
-        // Must belong to Karnataka districts
-        const inKarnataka = karnatakaDistricts.some(dist => crop.district && crop.district.toLowerCase() === dist.toLowerCase()) || crop.location.includes('Karnataka');
-        if (!inKarnataka) return false;
-      }
-
-      // 2. District filter
-      if (selectedDistrict && crop.district !== selectedDistrict) return false;
-
-      // 3. Name, Kannada Name & Farmer Search
+      // 1. Name, Kannada Name & Farmer Search
       const text = search.toLowerCase();
       const matchesSearch = !search || 
         crop.name.toLowerCase().includes(text) || 
@@ -81,27 +68,8 @@ export default function Home({ onChangeTab }) {
         crop.farmer.name.toLowerCase().includes(text);
       if (!matchesSearch) return false;
       
-      // 4. Category filter
-      if (category) {
-        if (scope === 'karnataka') {
-          // Custom mapping for Karnataka local category selections
-          if (category === 'Rice') {
-            // Sona Masuri, Basmati, Red Rice, Brown Rice, Paddy Rice (categorized under Grains in DB or names matching Rice/Paddy)
-            const isRiceItem = crop.name.toLowerCase().includes('rice') || crop.name.toLowerCase().includes('paddy') || (crop.localName && (crop.localName.includes('ಅಕ್ಕಿ') || crop.localName.includes('ಭತ್ತ')));
-            if (!isRiceItem) return false;
-          } else if (category === 'Millets') {
-            if (crop.category !== 'Millets') return false;
-          } else if (category === 'Pulses') {
-            if (crop.category !== 'Pulses') return false;
-          } else if (category === 'Oil Seeds') {
-            if (crop.category !== 'Oil Seeds') return false;
-          } else if (category === 'Commercial Crops') {
-            if (crop.category !== 'Commercial Crops') return false;
-          }
-        } else {
-          if (crop.category !== category) return false;
-        }
-      }
+      // 2. Category filter
+      if (category && crop.category !== category) return false;
 
       return true;
     })
@@ -115,11 +83,6 @@ export default function Home({ onChangeTab }) {
         const bOrg = b.category === 'Organic products' ? 1 : 0;
         return bOrg - aOrg;
       }
-      if (sortBy === 'nearby') {
-        const aNear = a.location.includes('Mandya') ? 1 : 0;
-        const bNear = b.location.includes('Mandya') ? 1 : 0;
-        return bNear - aNear;
-      }
       return 0;
     });
 
@@ -128,84 +91,190 @@ export default function Home({ onChangeTab }) {
 
   return (
     <div className="fade-in" style={styles.container}>
-      {/* Hero Section */}
-      <section style={styles.hero} className="glass-card">
-        <h1 style={styles.heroTitle}>{t('title')}</h1>
-        <p style={styles.heroSubtitle}>{t('slogan')}</p>
-        <div style={styles.heroBtns}>
-          <button onClick={() => onChangeTab('dashboard')} className="btn btn-primary" style={{ padding: '12px 28px', fontSize: '15px' }}>
-            Get Started
-          </button>
-          <button onClick={() => onChangeTab('infohub')} className="btn btn-secondary" style={{ padding: '12px 28px', fontSize: '15px' }}>
-            Check Mandi Rates
-          </button>
+      {/* Full-width Agriculture Cover Header Hero Section with Parallax */}
+      <section style={{ ...styles.heroCover, backgroundPositionY: `${scrollY * 0.35}px` }}>
+        <div style={styles.heroOverlayCover}></div>
+        <div style={styles.heroContentCover}>
+          <h1 style={styles.heroTitleCover}>Smart Agriculture Marketplace</h1>
+          <p style={styles.heroSubtitleCover}>"Empowering Farmers, Connecting Buyers."</p>
+          <p style={styles.heroDescriptionCover}>
+            Experience direct trading with verified farmers. Real-time bargaining, transparent AI price estimation, and secured transactions.
+          </p>
         </div>
       </section>
 
-      {/* Scope Toggles */}
-      <div style={styles.scopeContainer}>
-        <button 
-          onClick={() => { setScope('all'); setCategory(''); setSelectedDistrict(''); }}
-          style={{
-            ...styles.scopeTab,
-            borderBottom: scope === 'all' ? '3px solid var(--forest-green)' : 'none',
-            color: scope === 'all' ? 'var(--text-primary)' : 'var(--text-secondary)'
-          }}
-        >
-          All India Marketplace
-        </button>
-        <button 
-          onClick={() => { setScope('karnataka'); setCategory(''); setSelectedDistrict(''); }}
-          style={{
-            ...styles.scopeTab,
-            borderBottom: scope === 'karnataka' ? '3px solid var(--amber-gold)' : 'none',
-            color: scope === 'karnataka' ? 'var(--text-primary)' : 'var(--text-secondary)'
-          }}
-        >
-          {language === 'kn' ? 'ಕರ್ನಾಟಕ ಧಾನ್ಯಗಳು ಮತ್ತು ಸಿರಿಧಾನ್ಯಗಳು' : 'Karnataka Grains & Millets Showcase'}
-        </button>
-      </div>
+      {/* Two Separate Visually Attractive Entrance Cards */}
+      <section style={styles.authPortalGrid}>
+        {/* Buyer Section Card */}
+        <div className="glass-card portal-entrance-card" style={{ ...styles.portalCard, borderLeft: '5px solid var(--forest-green)' }}>
+          <div style={styles.portalCardIconWrapper}>
+            <ShoppingBag size={24} color="var(--forest-green)" />
+          </div>
+          <h3 style={styles.portalCardTitle}>Buyer Direct Portal</h3>
+          <p style={styles.portalCardDesc}>
+            Access high-yield Karnataka grains, traditional millets (Shree Anna), spices, and dairy. Bid in live crop auctions or secure bulk organic boxes.
+          </p>
+          <div style={styles.portalActionRow}>
+            <button 
+              onClick={() => onChangeTab('login', { tab: 'login', role: 'buyer' })} 
+              className="btn btn-3d-primary"
+              style={styles.portalBtn}
+            >
+              Buyer Login
+            </button>
+            <button 
+              onClick={() => onChangeTab('login', { tab: 'register', role: 'buyer' })} 
+              className="btn btn-3d-outline"
+              style={styles.portalBtn}
+            >
+              Buyer Register
+            </button>
+          </div>
+        </div>
+
+        {/* Farmer Section Card */}
+        <div className="glass-card portal-entrance-card" style={{ ...styles.portalCard, borderLeft: '5px solid var(--amber-gold)' }}>
+          <div style={styles.portalCardIconWrapper}>
+            <Sprout size={24} color="var(--amber-gold)" />
+          </div>
+          <h3 style={styles.portalCardTitle}>Farmer Direct Portal</h3>
+          <p style={styles.portalCardDesc}>
+            Publish crop listings, evaluate historic mandi rates using our AI dynamic pricing engine, negotiate prices with buyers, and track earnings.
+          </p>
+          <div style={styles.portalActionRow}>
+            <button 
+              onClick={() => onChangeTab('login', { tab: 'login', role: 'farmer' })} 
+              className="btn btn-3d-gold"
+              style={styles.portalBtn}
+            >
+              Farmer Login
+            </button>
+            <button 
+              onClick={() => onChangeTab('login', { tab: 'register', role: 'farmer' })} 
+              className="btn btn-3d-outline"
+              style={{ ...styles.portalBtn, color: 'var(--amber-gold)', borderColor: 'var(--amber-gold)', boxShadow: '0 4px 0 var(--border-color)' }}
+            >
+              Farmer Register
+            </button>
+          </div>
+        </div>
+      </section>
 
       {/* Trust Factors */}
-      {scope === 'all' ? (
-        <div style={styles.featuresGrid}>
-          <div className="glass-card" style={styles.featureCard}>
-            <Landmark size={36} color="var(--forest-green)" />
-            <h3>Direct Trade Platform</h3>
-            <p>Bypass middlemen. Trade directly with verified local farmers and receive the best crop valuations without commissions.</p>
-          </div>
-          <div className="glass-card" style={styles.featureCard}>
-            <TrendingUp size={36} color="var(--forest-green)" />
-            <h3>AI Valuation Models</h3>
-            <p>Instantly estimate crop prices by parsing historic mandi rates and local crop metrics to support fair trade policies.</p>
-          </div>
-          <div className="glass-card" style={styles.featureCard}>
-            <ShieldCheck size={36} color="var(--forest-green)" />
-            <h3>Reputation Badge Score</h3>
-            <p>Farmers accumulate rating feedback to unlock reputation tiers, securing the verified "Trusted Farmer" badge.</p>
-          </div>
+      <div style={styles.featuresGrid}>
+        <div 
+          className="glass-card feature-3d-card" 
+          style={styles.featureCard}
+          onClick={() => onChangeTab('dashboard')}
+        >
+          <Landmark size={36} color="var(--forest-green)" />
+          <h3>Direct Trade Platform</h3>
+          <p>Bypass middlemen. Trade directly with verified local farmers and receive the best crop valuations without commissions.</p>
         </div>
-      ) : (
-        <div style={styles.karnatakaPromoCard}>
-          <div style={styles.karnatakaFlagStrip}></div>
-          <div style={{ padding: '20px' }}>
-            <h3 style={{ color: 'var(--text-primary)', fontSize: '18px', marginBottom: '8px' }}>
-              {language === 'kn' ? 'ಸಿರಿಧಾನ್ಯ ಮತ್ತು ಧಾನ್ಯಗಳ ಕರ್ನಾಟಕ ಪ್ರದರ್ಶನ' : 'Traditional Grains & Millets (Shree Anna) Hub'}
-            </h3>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '13px' }}>
-              Showcasing Mandya Sona Masuri, Tumakuru Ragi, Vijayapura Jowar, Dharwad Bengal Gram, and coastal spices directly from Karnataka farmers.
+        <div 
+          className="glass-card feature-3d-card" 
+          style={styles.featureCard}
+          onClick={() => onChangeTab('aivaluation')}
+        >
+          <TrendingUp size={36} color="var(--forest-green)" />
+          <h3>AI Valuation Models</h3>
+          <p>Instantly estimate crop prices by parsing historic mandi rates and local crop metrics to support fair trade policies.</p>
+        </div>
+        <div 
+          className="glass-card feature-3d-card" 
+          style={styles.featureCard}
+          onClick={() => onChangeTab('reputation')}
+        >
+          <ShieldCheck size={36} color="var(--forest-green)" />
+          <h3>Reputation Badge Score</h3>
+          <p>Farmers accumulate rating feedback to unlock reputation tiers, securing the verified "Trusted Farmer" badge.</p>
+        </div>
+      </div>
+
+      {/* Featured / Top Farmers Section */}
+      <section style={styles.featuredFarmersSection}>
+        <div style={styles.sectionHeaderRow}>
+          <div>
+            <h2 style={styles.sectionTitle}>Meet Our Top Farmers</h2>
+            <p style={{ fontSize: '13px', color: 'var(--text-secondary)', marginTop: '4px' }}>
+              Real profiles of trusted agricultural producers delivering organic grains and fresh produce.
             </p>
           </div>
+          <span className="badge badge-verified" style={{ padding: '6px 14px' }}>Direct Sourced</span>
         </div>
-      )}
+
+        <div style={styles.farmersGrid}>
+          {(() => {
+            // Group unique farmers from allCrops
+            const farmersMap = {};
+            allCrops.forEach(crop => {
+              if (crop.farmer && crop.farmer._id && !farmersMap[crop.farmer._id]) {
+                farmersMap[crop.farmer._id] = {
+                  ...crop.farmer,
+                  location: crop.location || 'Karnataka, India',
+                  products: new Set()
+                };
+              }
+              if (crop.farmer && crop.farmer._id) {
+                farmersMap[crop.farmer._id].products.add(crop.name);
+              }
+            });
+            const topFarmers = Object.values(farmersMap)
+              .sort((a, b) => (b.smartFarmingScore?.overallScore || 0) - (a.smartFarmingScore?.overallScore || 0))
+              .slice(0, 4);
+
+            if (topFarmers.length === 0) {
+              return <div style={{ color: 'var(--text-secondary)', fontSize: '13px' }}>Loading top farmers...</div>;
+            }
+
+            return topFarmers.map((f, idx) => (
+              <div key={f._id || idx} className="glass-card" style={styles.farmerCard}>
+                <div style={styles.farmerCardHeader}>
+                  <img 
+                    src={f.avatarUrl || "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=120&q=80"} 
+                    alt={f.name} 
+                    style={styles.farmerAvatar} 
+                  />
+                  <div>
+                    <h4 style={{ margin: '0 0 2px 0', fontSize: '15px' }}>{f.name}</h4>
+                    <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>{f.location}</span>
+                  </div>
+                </div>
+                
+                <div style={styles.farmerStats}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    <Star size={13} fill="var(--amber-gold)" color="var(--amber-gold)" />
+                    <span style={{ fontWeight: '700', fontSize: '12px' }}>{f.smartFarmingScore?.overallScore || '4.8'}</span>
+                  </div>
+                  {f.hasTrustedBadge && (
+                    <span className="badge badge-trusted" style={{ fontSize: '9px', padding: '1px 6px' }}>Trusted</span>
+                  )}
+                  {f.isVerified && (
+                    <span className="badge badge-verified" style={{ fontSize: '9px', padding: '1px 6px' }}>Verified</span>
+                  )}
+                </div>
+
+                <div style={styles.farmerProducts}>
+                  <strong style={{ fontSize: '11px', color: 'var(--text-secondary)', textTransform: 'uppercase' }}>Crops Listed:</strong>
+                  <div style={styles.productsTags}>
+                    {Array.from(f.products).slice(0, 3).map((prod, pIdx) => (
+                      <span key={pIdx} style={styles.productTag}>{prod}</span>
+                    ))}
+                    {f.products.size > 3 && (
+                      <span style={{ fontSize: '11px', color: 'var(--text-secondary)', marginLeft: '4px' }}>+{f.products.size - 3} more</span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ));
+          })()}
+        </div>
+      </section>
 
       {/* Dynamic Catalog Section */}
       <section style={styles.catalogSection}>
         <h2 style={styles.sectionTitle}>
-          {scope === 'karnataka' 
-            ? (t('karnatakaMarketplace'))
-            : (category === 'Grains' ? 'Active Grain Showcase Hub' : 'Active Crop & Product Showcase')
-          }
+          Active Crop Showcase
         </h2>
 
         {/* Category Pills Slider */}
@@ -220,7 +289,7 @@ export default function Home({ onChangeTab }) {
           >
             All Products
           </button>
-          {(scope === 'karnataka' ? karnatakaCategories : indiaCategories).map((cat, idx) => (
+          {indiaCategories.map((cat, idx) => (
             <button
               key={idx}
               onClick={() => setCategory(cat)}
@@ -249,23 +318,6 @@ export default function Home({ onChangeTab }) {
           </div>
 
           <div style={styles.filtersGroup}>
-            {scope === 'karnataka' && (
-              <div style={styles.sortBox}>
-                <Filter size={16} color="var(--text-secondary)" />
-                <select 
-                  className="form-input" 
-                  style={styles.sortSelect} 
-                  value={selectedDistrict} 
-                  onChange={(e) => setSelectedDistrict(e.target.value)}
-                >
-                  <option value="">{t('searchDistPlaceholder')}</option>
-                  {karnatakaDistricts.map((dist, idx) => (
-                    <option key={idx} value={dist}>{dist}</option>
-                  ))}
-                </select>
-              </div>
-            )}
-
             <div style={styles.sortBox}>
               <Filter size={16} color="var(--text-secondary)" />
               <select 
@@ -279,7 +331,6 @@ export default function Home({ onChangeTab }) {
                 <option value="price-asc">Sort: Price (Low to High)</option>
                 <option value="price-desc">Sort: Price (High to Low)</option>
                 <option value="organic">Sort: Organic Products</option>
-                <option value="nearby">Sort: Nearest to Mandya</option>
               </select>
             </div>
           </div>
@@ -301,8 +352,8 @@ export default function Home({ onChangeTab }) {
                     className="glass-card" 
                     style={{
                       ...styles.cropCard,
-                      border: scope === 'karnataka' ? '1px solid rgba(217, 119, 6, 0.3)' : '1px solid var(--glass-border)',
-                      boxShadow: scope === 'karnataka' ? '0 8px 30px rgba(217, 119, 6, 0.05)' : 'var(--shadow-md)'
+                      border: '1px solid var(--glass-border)',
+                      boxShadow: 'var(--shadow-md)'
                     }}
                   >
                     {/* Image Panel with Overlays */}
@@ -378,14 +429,35 @@ export default function Home({ onChangeTab }) {
                         </span>
                       </div>
 
-                      <button 
-                        onClick={() => onChangeTab('dashboard')} 
-                        className="btn btn-outline" 
-                        style={styles.viewBtn}
-                        disabled={isSoldOut}
-                      >
-                        {isSoldOut ? 'Out of Stock' : 'View Listing / Buy'}
-                      </button>
+                      {crop.listingMode === 'buynow' ? (
+                        <div style={{ display: 'flex', gap: '8px', marginTop: '10px', width: '100%' }}>
+                          <button 
+                            onClick={() => onChangeTab('dashboard', { action: 'buy', crop })} 
+                            className="btn btn-primary" 
+                            style={{ flex: 1, padding: '8px 6px', fontSize: '11px', fontWeight: 'bold' }}
+                            disabled={isSoldOut}
+                          >
+                            Buy Now
+                          </button>
+                          <button 
+                            onClick={() => onChangeTab('dashboard', { action: 'negotiate', crop })} 
+                            className="btn btn-outline" 
+                            style={{ flex: 1, padding: '8px 6px', fontSize: '11px', fontWeight: 'bold', borderColor: 'var(--amber-gold)', color: 'var(--amber-gold)' }}
+                            disabled={isSoldOut}
+                          >
+                            Negotiate
+                          </button>
+                        </div>
+                      ) : (
+                        <button 
+                          onClick={() => onChangeTab('dashboard', { action: 'buy', crop })} 
+                          className="btn btn-primary" 
+                          style={{ width: '100%', padding: '8px 12px', fontSize: '12px', marginTop: '10px', fontWeight: 'bold' }}
+                          disabled={isSoldOut}
+                        >
+                          Join Auction / Bid
+                        </button>
+                      )}
                     </div>
                   </div>
                 );
@@ -728,5 +800,174 @@ const styles = {
     display: 'flex',
     justifyContent: 'center',
     marginTop: '30px'
+  },
+  featuredFarmersSection: {
+    margin: '35px 0',
+    textAlign: 'left'
+  },
+  sectionHeaderRow: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: '20px',
+    flexWrap: 'wrap',
+    gap: '15px'
+  },
+  farmersGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+    gap: '20px'
+  },
+  farmerCard: {
+    padding: '20px',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '15px'
+  },
+  farmerCardHeader: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '15px'
+  },
+  farmerAvatar: {
+    width: '50px',
+    height: '50px',
+    borderRadius: '50%',
+    objectFit: 'cover',
+    border: '2px solid var(--forest-green)'
+  },
+  farmerStats: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '10px',
+    borderBottom: '1px solid var(--border-color)',
+    borderTop: '1px solid var(--border-color)',
+    padding: '8px 0',
+    flexWrap: 'wrap'
+  },
+  farmerProducts: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '6px'
+  },
+  productsTags: {
+    display: 'flex',
+    gap: '6px',
+    flexWrap: 'wrap',
+    alignItems: 'center'
+  },
+  productTag: {
+    fontSize: '11px',
+    backgroundColor: 'var(--bg-secondary)',
+    color: 'var(--text-primary)',
+    padding: '3px 8px',
+    borderRadius: '4px',
+    border: '1px solid var(--border-color)'
+  },
+  heroCover: {
+    width: '100%',
+    height: '350px',
+    borderRadius: '16px',
+    backgroundImage: 'url("/hero_bg.jpg")',
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    position: 'relative',
+    overflow: 'hidden',
+    marginBottom: '35px',
+    boxShadow: 'var(--shadow-lg)',
+    border: '1px solid var(--glass-border)'
+  },
+  heroOverlayCover: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.45)', // Dark overlay for high readability
+    backdropFilter: 'blur(2px)', // Blurred overlay
+    zIndex: 1
+  },
+  heroContentCover: {
+    zIndex: 2,
+    color: 'white',
+    padding: '20px',
+    maxWidth: '750px',
+    textAlign: 'center',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '12px'
+  },
+  heroTitleCover: {
+    fontSize: '36px',
+    fontWeight: '800',
+    fontFamily: 'var(--header-font)',
+    color: '#ffffff',
+    textShadow: '0 2px 4px rgba(0,0,0,0.6)',
+    margin: 0
+  },
+  heroSubtitleCover: {
+    fontSize: '20px',
+    fontWeight: '600',
+    color: 'var(--amber-gold)',
+    textShadow: '0 2px 4px rgba(0,0,0,0.6)',
+    fontStyle: 'italic',
+    margin: 0
+  },
+  heroDescriptionCover: {
+    fontSize: '14px',
+    color: 'rgba(255, 255, 255, 0.95)',
+    textShadow: '0 1px 2px rgba(0,0,0,0.5)',
+    lineHeight: '1.6',
+    margin: 0
+  },
+  authPortalGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+    gap: '24px',
+    marginBottom: '35px'
+  },
+  portalCard: {
+    padding: '24px',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '15px',
+    textAlign: 'left',
+    transition: 'transform 0.2s, box-shadow 0.2s'
+  },
+  portalCardIconWrapper: {
+    width: '45px',
+    height: '45px',
+    borderRadius: '10px',
+    backgroundColor: 'var(--bg-secondary)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  portalCardTitle: {
+    fontSize: '18px',
+    fontWeight: '700',
+    color: 'var(--text-primary)',
+    margin: 0
+  },
+  portalCardDesc: {
+    fontSize: '13px',
+    color: 'var(--text-secondary)',
+    lineHeight: '1.5',
+    margin: 0,
+    minHeight: '60px'
+  },
+  portalActionRow: {
+    display: 'flex',
+    gap: '12px',
+    marginTop: 'auto'
+  },
+  portalBtn: {
+    flex: 1,
+    padding: '10px 16px',
+    fontSize: '13px',
+    fontWeight: '700'
   }
 };

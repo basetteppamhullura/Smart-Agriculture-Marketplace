@@ -1,20 +1,32 @@
 [
   {
-    "_id": "auction_1",
-    "crop": "crop_2",
+    "_id": "2761qrl",
+    "crop": "vx519jj",
     "durationHours": 24,
-    "startTime": "2026-07-18T01:33:59.685Z",
-    "endTime": "2026-07-19T01:33:59.685Z",
-    "bids": [
-      {
-        "buyer": "user_buyer_1",
-        "amount": 32,
-        "timestamp": "2026-07-18T02:33:59.685Z"
-      }
-    ],
-    "highestBid": 32,
-    "highestBidder": "user_buyer_1",
+    "endTime": "2026-07-20T03:55:03.716Z",
+    "highestBid": 8500,
+    "bids": [],
     "status": "active",
-    "createdAt": "2026-07-18T01:33:59.685Z"
+    "createdAt": "2026-07-19T03:55:03.717Z"
+  },
+  {
+    "_id": "zpg9ugc",
+    "crop": "wzgzoq4",
+    "durationHours": 24,
+    "endTime": "2026-07-20T14:45:47.448Z",
+    "highestBid": 32,
+    "bids": [],
+    "status": "active",
+    "createdAt": "2026-07-19T14:45:47.450Z"
+  },
+  {
+    "_id": "p908fww",
+    "crop": "tyjvav7",
+    "durationHours": 24,
+    "endTime": "2026-07-20T14:47:04.240Z",
+    "highestBid": 32,
+    "bids": [],
+    "status": "active",
+    "createdAt": "2026-07-19T14:47:04.241Z"
   }
 ]

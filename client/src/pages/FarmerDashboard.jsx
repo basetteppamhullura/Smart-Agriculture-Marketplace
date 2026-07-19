@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useThemeLanguage } from '../context/ThemeLanguageContext';
 import AnalyticsChart from '../components/AnalyticsChart';
+import BargainingHub from '../components/BargainingHub';
 import { Plus, Check, DollarSign, Wallet, Sprout, TrendingUp, Info, Edit, Trash2, ShieldAlert, Eye, ShoppingCart, Ban, Award } from 'lucide-react';
 
 export default function FarmerDashboard() {
@@ -354,6 +355,16 @@ export default function FarmerDashboard() {
           }}
         >
           Financial Planning & Expense Tracker
+        </button>
+        <button
+          onClick={() => setActiveSubTab('bargains')}
+          style={{
+            ...styles.subTabBtn,
+            backgroundColor: activeSubTab === 'bargains' ? 'var(--forest-green)' : 'transparent',
+            color: activeSubTab === 'bargains' ? 'white' : 'var(--text-secondary)'
+          }}
+        >
+          Negotiation Offers
         </button>
       </div>
 
@@ -759,6 +770,12 @@ export default function FarmerDashboard() {
               </table>
             </div>
           </div>
+        </div>
+      )}
+
+      {activeSubTab === 'bargains' && (
+        <div style={styles.tabContent} className="fade-in">
+          <BargainingHub />
         </div>
       )}
     </div>

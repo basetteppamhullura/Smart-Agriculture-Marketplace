@@ -1,7 +1,7 @@
 import React from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useThemeLanguage } from '../context/ThemeLanguageContext';
-import { Home, LayoutDashboard, MessageSquare, Truck, Landmark, BookOpen, ChevronRight, Award } from 'lucide-react';
+import { Home, LayoutDashboard, MessageSquare, Truck, Landmark, BookOpen, ChevronRight, Award, Brain } from 'lucide-react';
 
 export default function Sidebar({ currentTab, onChangeTab }) {
   const { user } = useAuth();
@@ -11,6 +11,8 @@ export default function Sidebar({ currentTab, onChangeTab }) {
     { id: 'home', label: t('navHome'), icon: Home },
     { id: 'dashboard', label: t('navDashboard'), icon: LayoutDashboard, requiresAuth: true },
     { id: 'forum', label: t('navForum'), icon: MessageSquare },
+    { id: 'aivaluation', label: 'AI Crop Valuation', icon: Brain },
+    { id: 'reputation', label: 'Farmer Reputation', icon: Award },
     { id: 'logistics', label: t('navLogistics'), icon: Truck },
     { id: 'finance', label: t('navFinance'), icon: Landmark },
     { id: 'infohub', label: t('navInfoHub'), icon: BookOpen }

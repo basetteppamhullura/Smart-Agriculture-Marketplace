@@ -1,19 +1,24 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useThemeLanguage } from '../context/ThemeLanguageContext';
 import { Sprout, LogIn, UserPlus, Info } from 'lucide-react';
 
-export default function LoginRegister({ onAuthSuccess }) {
+export default function LoginRegister({ onAuthSuccess, initialTab = 'login', initialRole = 'buyer' }) {
   const { login, register, error } = useAuth();
   const { t } = useThemeLanguage();
 
-  const [activeTab, setActiveTab] = useState('login'); // 'login' | 'register'
-  const [role, setRole] = useState('buyer'); // 'farmer' | 'buyer'
+  const [activeTab, setActiveTab] = useState(initialTab); // 'login' | 'register'
+  const [role, setRole] = useState(initialRole); // 'farmer' | 'buyer'
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [location, setLocation] = useState('Mandya, Karnataka');
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (initialTab) setActiveTab(initialTab);
+    if (initialRole) setRole(initialRole);
+  }, [initialTab, initialRole]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

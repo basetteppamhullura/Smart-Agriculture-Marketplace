@@ -22,7 +22,15 @@ const createOrder = async (req, res) => {
       return res.status(400).json({ message: `Only ${crop.quantity} kg available. Requested: ${buyQty} kg` });
     }
 
-    const totalCost = crop.price * buyQty;
+    let finalPrice = crop.price;
+    if (req.body.negotiationId) {
+      const negotiation = await dbManager.negotiations.findById(req.body.negotiationId);
+      if (negotiation && negotiation.status === 'Accepted') {
+        finalPrice = negotiation.currentOffer;
+      }
+    }
+
+    const totalCost = finalPrice * buyQty;
 
     // Verify buyer has enough wallet balance
     const buyer = await dbManager.users.findById(buyerId);

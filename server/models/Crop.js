@@ -58,6 +58,10 @@ const CropSchema = new mongoose.Schema({
     type: Number, // Buy Now price or starting bid price
     required: true
   },
+  minPriceAcceptable: {
+    type: Number,
+    default: 0
+  },
   aiPriceRecommended: {
     type: Number
   },
