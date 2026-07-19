@@ -17,6 +17,8 @@ import FinancialTools from './pages/FinancialTools';
 import InfoHub from './pages/InfoHub';
 import AiValuationPage from './pages/AiValuationPage';
 import ReputationDashboard from './pages/ReputationDashboard';
+import BuyerFeaturesPage from './pages/BuyerFeaturesPage';
+import FarmerFeaturesPage from './pages/FarmerFeaturesPage';
 
 function MainAppContent() {
   const { user } = useAuth();
@@ -80,6 +82,30 @@ function MainAppContent() {
         return <AiValuationPage />;
       case 'reputation':
         return <ReputationDashboard />;
+      case 'buyer-features':
+        return (
+          <BuyerFeaturesPage 
+            onChangeTab={(tab, payload) => {
+              if (tab === 'login' && payload) {
+                setAuthInitialTab(payload.tab || 'login');
+                setAuthInitialRole(payload.role || 'buyer');
+              }
+              setCurrentTab(tab);
+            }} 
+          />
+        );
+      case 'farmer-features':
+        return (
+          <FarmerFeaturesPage 
+            onChangeTab={(tab, payload) => {
+              if (tab === 'login' && payload) {
+                setAuthInitialTab(payload.tab || 'login');
+                setAuthInitialRole(payload.role || 'farmer');
+              }
+              setCurrentTab(tab);
+            }} 
+          />
+        );
       default:
         return <Home onChangeTab={setCurrentTab} />;
     }

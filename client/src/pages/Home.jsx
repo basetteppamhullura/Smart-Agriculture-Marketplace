@@ -106,55 +106,47 @@ export default function Home({ onChangeTab }) {
       {/* Two Separate Visually Attractive Entrance Cards */}
       <section style={styles.authPortalGrid}>
         {/* Buyer Section Card */}
-        <div className="glass-card portal-entrance-card" style={{ ...styles.portalCard, borderLeft: '5px solid var(--forest-green)' }}>
+        <div 
+          className="glass-card portal-entrance-card" 
+          style={{ ...styles.portalCard, borderLeft: '5px solid var(--forest-green)' }}
+          onClick={() => onChangeTab('buyer-features')}
+        >
           <div style={styles.portalCardIconWrapper}>
             <ShoppingBag size={24} color="var(--forest-green)" />
           </div>
-          <h3 style={styles.portalCardTitle}>Buyer Direct Portal</h3>
+          <h3 style={styles.portalCardTitle}>Buyer Gateway</h3>
           <p style={styles.portalCardDesc}>
-            Access high-yield Karnataka grains, traditional millets (Shree Anna), spices, and dairy. Bid in live crop auctions or secure bulk organic boxes.
+            Access crop marketplace catalogs, place auction bids, track orders, manage bulk purchase plans, and make secure digital checkouts.
           </p>
           <div style={styles.portalActionRow}>
             <button 
-              onClick={() => onChangeTab('login', { tab: 'login', role: 'buyer' })} 
               className="btn btn-3d-primary"
-              style={styles.portalBtn}
+              style={{ ...styles.portalBtn, width: '100%' }}
             >
-              Buyer Login
-            </button>
-            <button 
-              onClick={() => onChangeTab('login', { tab: 'register', role: 'buyer' })} 
-              className="btn btn-3d-outline"
-              style={styles.portalBtn}
-            >
-              Buyer Register
+              Explore Buyer Features
             </button>
           </div>
         </div>
 
         {/* Farmer Section Card */}
-        <div className="glass-card portal-entrance-card" style={{ ...styles.portalCard, borderLeft: '5px solid var(--amber-gold)' }}>
+        <div 
+          className="glass-card portal-entrance-card" 
+          style={{ ...styles.portalCard, borderLeft: '5px solid var(--amber-gold)' }}
+          onClick={() => onChangeTab('farmer-features')}
+        >
           <div style={styles.portalCardIconWrapper}>
             <Sprout size={24} color="var(--amber-gold)" />
           </div>
-          <h3 style={styles.portalCardTitle}>Farmer Direct Portal</h3>
+          <h3 style={styles.portalCardTitle}>Farmer (Seller) Gateway</h3>
           <p style={styles.portalCardDesc}>
-            Publish crop listings, evaluate historic mandi rates using our AI dynamic pricing engine, negotiate prices with buyers, and track earnings.
+            Upload produce images, consult AI pricing models, forecast trends, check plant health, and track digital wallet earnings.
           </p>
           <div style={styles.portalActionRow}>
             <button 
-              onClick={() => onChangeTab('login', { tab: 'login', role: 'farmer' })} 
               className="btn btn-3d-gold"
-              style={styles.portalBtn}
+              style={{ ...styles.portalBtn, width: '100%' }}
             >
-              Farmer Login
-            </button>
-            <button 
-              onClick={() => onChangeTab('login', { tab: 'register', role: 'farmer' })} 
-              className="btn btn-3d-outline"
-              style={{ ...styles.portalBtn, color: 'var(--amber-gold)', borderColor: 'var(--amber-gold)', boxShadow: '0 4px 0 var(--border-color)' }}
-            >
-              Farmer Register
+              Explore Farmer Features
             </button>
           </div>
         </div>
