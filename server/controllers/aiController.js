@@ -152,7 +152,7 @@ const chatbotQuery = (req, res) => {
   let response = '';
 
   if (query.includes('pest') || query.includes('insect')) {
-    response = 'For organic pest control, you can prepare a garlic-chilli spray or spray 5% Neem Seed Kernel Extract (NSKE). For severe insect infestation, please consult our Expert Consultation Forum section.';
+    response = 'For organic pest control, you can prepare a garlic-chilli spray or spray 5% Neem Seed Kernel Extract (NSKE). For severe insect infestation, please consult our Information Hub for agricultural guides.';
   } else if (query.includes('subsidy') || query.includes('scheme') || query.includes('government')) {
     response = 'The PM-KISAN scheme provides income support of Rs 6,000 per year to all landholding farmer families. Also, PM Fasal Bima Yojana offers low-premium crop insurance. You can review and apply in our daily Information Hub!';
   } else if (query.includes('price') || query.includes('pricing') || query.includes('market')) {

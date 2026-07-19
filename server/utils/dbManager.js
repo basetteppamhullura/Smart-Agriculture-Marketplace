@@ -6,7 +6,6 @@ const User = require('../models/User');
 const Crop = require('../models/Crop');
 const Auction = require('../models/Auction');
 const Order = require('../models/Order');
-const ForumPost = require('../models/ForumPost');
 const Review = require('../models/Review');
 const Question = require('../models/Question');
 const Negotiation = require('../models/Negotiation');
@@ -953,29 +952,6 @@ const seedAuctions = [
   }
 ];
 
-const seedForums = [
-  {
-    _id: "post_1",
-    author: "user_farmer_1",
-    authorName: "Basappa Gowda",
-    title: "Best organic fertilizer for paddy crops?",
-    content: "Hi all, I am looking to shift fully to organic fertilizers for my basmati crop. Are there reliable local recommendations that don't compromise yield?",
-    category: "Organic Farming",
-    upvotes: ["user_farmer_2", "user_buyer_1"],
-    comments: [
-      {
-        author: "user_admin_1",
-        authorName: "Agri Expert",
-        authorRole: "admin",
-        content: "Hello Basappa! Jeevamrutha is an excellent organic formulation made from cow dung, urine, jaggery, and pulse flour. It boosts soil microbes significantly. Also, check out Gov Scheme PM-PRANAM for organic compost subsidies.",
-        createdAt: new Date(Date.now() - 3600000 * 12).toISOString()
-      }
-    ],
-    isExpertAnswered: true,
-    createdAt: new Date(Date.now() - 3600000 * 24).toISOString()
-  }
-];
-
 const seedReviews = [
   {
     _id: "review_1",
@@ -1054,7 +1030,6 @@ const seedAllData = async () => {
         });
         await Crop.insertMany(cropsToInsert);
         await Auction.insertMany(seedAuctions);
-        await ForumPost.insertMany(seedForums);
         await Review.insertMany(seedReviews);
         await Question.insertMany(seedQuestions);
         console.log('MongoDB Seeded successfully.');
@@ -1079,7 +1054,6 @@ const seedAllData = async () => {
       });
       writeJson('crops', cropsToInsert);
       writeJson('auctions', seedAuctions);
-      writeJson('forum_posts', seedForums);
       writeJson('reviews', seedReviews);
       writeJson('questions', seedQuestions);
       writeJson('orders', []);
@@ -1448,61 +1422,6 @@ const dbManager = {
       writeJson('orders', orders);
       return updatedItem;
     }
-  },
-
-  forumPosts: {
-    find: async (query = {}) => {
-      if (!db.useLocalMock()) return await ForumPost.find(query);
-      let posts = readJson('forum_posts');
-      return posts.filter(item => {
-        for (let k in query) {
-          if (item[k] !== query[k]) return false;
-        }
-        return true;
-      });
-    },
-    findOne: async (query) => {
-      if (!db.useLocalMock()) return await ForumPost.findOne(query);
-      let posts = readJson('forum_posts');
-      return posts.find(item => {
-        for (let k in query) {
-          if (item[k] !== query[k]) return false;
-        }
-        return true;
-      }) || null;
-    },
-    findById: async (id) => {
-      if (!db.useLocalMock()) return await ForumPost.findById(id);
-      let posts = readJson('forum_posts');
-      return posts.find(item => item._id === id) || null;
-    },
-    create: async (doc) => {
-      if (!db.useLocalMock()) return await ForumPost.create(doc);
-      let posts = readJson('forum_posts');
-      const newDoc = { 
-        _id: generateId(), 
-        ...doc, 
-        upvotes: [], 
-        comments: [], 
-        isExpertAnswered: false, 
-        createdAt: new Date().toISOString() 
-      };
-      posts.push(newDoc);
-      writeJson('forum_posts', posts);
-      return newDoc;
-    },
-    findByIdAndUpdate: async (id, update) => {
-      if (!db.useLocalMock()) return await ForumPost.findByIdAndUpdate(id, update, { new: true });
-      let posts = readJson('forum_posts');
-      let index = posts.findIndex(item => item._id === id);
-      if (index === -1) return null;
-      const updatedItem = { ...posts[index], ...update };
-      posts[index] = updatedItem;
-      writeJson('forum_posts', posts);
-      return updatedItem;
-    }
-  },
-
   negotiations: {
     find: async (query = {}) => {
       if (!db.useLocalMock()) return await Negotiation.find(query);

@@ -10,7 +10,6 @@ export default function Sidebar({ currentTab, onChangeTab }) {
   const menuItems = [
     { id: 'home', label: t('navHome'), icon: Home },
     { id: 'dashboard', label: t('navDashboard'), icon: LayoutDashboard, requiresAuth: true },
-    { id: 'forum', label: t('navForum'), icon: MessageSquare },
     { id: 'aivaluation', label: 'AI Crop Valuation', icon: Brain },
     { id: 'reputation', label: 'Farmer Reputation', icon: Award },
     { id: 'logistics', label: t('navLogistics'), icon: Truck },

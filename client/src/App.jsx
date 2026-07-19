@@ -12,7 +12,6 @@ import LoginRegister from './pages/LoginRegister';
 import FarmerDashboard from './pages/FarmerDashboard';
 import BuyerDashboard from './pages/BuyerDashboard';
 import AdminDashboard from './pages/AdminDashboard';
-import CommunityForum from './pages/CommunityForum';
 import LogisticsHub from './pages/LogisticsHub';
 import FinancialTools from './pages/FinancialTools';
 import InfoHub from './pages/InfoHub';
@@ -71,8 +70,6 @@ function MainAppContent() {
         );
         if (user.role === 'admin') return <AdminDashboard />;
         return <div style={{ padding: '20px' }}>Dashboard type not supported.</div>;
-      case 'forum':
-        return <CommunityForum />;
       case 'logistics':
         return <LogisticsHub />;
       case 'finance':

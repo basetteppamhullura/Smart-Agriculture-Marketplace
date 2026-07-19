@@ -18,7 +18,6 @@ app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/crops', require('./routes/cropRoutes'));
 app.use('/api/auctions', require('./routes/auctionRoutes'));
 app.use('/api/orders', require('./routes/orderRoutes'));
-app.use('/api/forum', require('./routes/forumRoutes'));
 app.use('/api/ai', require('./routes/aiRoutes'));
 app.use('/api/negotiations', require('./routes/negotiationRoutes'));
 
