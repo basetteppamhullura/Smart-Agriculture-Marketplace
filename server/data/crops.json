@@ -1,35 +1,5 @@
 [
   {
-    "_id": "wzgzoq4",
-    "farmer": "ylexhcw",
-    "name": "Green Grains",
-    "localName": "hesaru",
-    "category": "Grains",
-    "quantity": 500,
-    "qualityGrade": "A",
-    "harvestDate": "2026-07-19T14:45:47.446Z",
-    "location": "Mandya, Karnataka",
-    "district": "Dharwad",
-    "village": "kotabal",
-    "listingMode": "auction",
-    "price": 32,
-    "aiPriceRecommended": 35,
-    "imageUrl": "url1",
-    "images": [
-      "url1"
-    ],
-    "stockStatus": "in-stock",
-    "deliveryOption": "farm-pickup",
-    "description": "its good",
-    "analytics": {
-      "views": 0,
-      "ordersCount": 0,
-      "revenue": 0
-    },
-    "status": "available",
-    "createdAt": "2026-07-19T14:45:47.447Z"
-  },
-  {
     "_id": "tyjvav7",
     "farmer": "ylexhcw",
     "name": "apple",

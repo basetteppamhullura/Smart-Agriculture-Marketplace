@@ -3,7 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { useThemeLanguage } from '../context/ThemeLanguageContext';
 import { Sprout, LogIn, UserPlus, KeyRound, CheckCircle2, ShieldCheck } from 'lucide-react';
 
-export default function LoginRegister({ onAuthSuccess, initialTab = 'login', initialRole = 'buyer' }) {
+export default function LoginRegister({ onAuthSuccess, initialTab = 'login', initialRole = 'buyer', lockRole = false, cardStyle = {} }) {
   const { login, register, error, apiUrl } = useAuth();
   const { t } = useThemeLanguage();
 
@@ -147,32 +147,34 @@ export default function LoginRegister({ onAuthSuccess, initialTab = 'login', ini
 
   return (
     <div className="fade-in" style={styles.wrapper}>
-      <div className="glass-card" style={styles.card}>
-        {/* Gateway Role Selector Banner */}
-        <div style={styles.gatewayBanner}>
-          <button
-            type="button"
-            onClick={() => setRole('buyer')}
-            style={{
-              ...styles.gatewayRoleBtn,
-              backgroundColor: role === 'buyer' ? 'var(--forest-green)' : 'transparent',
-              color: role === 'buyer' ? 'white' : 'var(--text-secondary)'
-            }}
-          >
-            Buyer Gateway
-          </button>
-          <button
-            type="button"
-            onClick={() => setRole('farmer')}
-            style={{
-              ...styles.gatewayRoleBtn,
-              backgroundColor: role === 'farmer' ? 'var(--amber-gold)' : 'transparent',
-              color: role === 'farmer' ? 'white' : 'var(--text-secondary)'
-            }}
-          >
-            Farmer (Seller) Gateway
-          </button>
-        </div>
+      <div className="glass-card" style={{ ...styles.card, ...cardStyle }}>
+        {/* Gateway Role Selector Banner (Top Level Tabs: Buyer | Farmer) */}
+        {!lockRole && (
+          <div style={{ ...styles.gatewayBanner, borderBottom: `2px solid ${role === 'farmer' ? 'var(--amber-gold)' : 'var(--forest-green)'}` }}>
+            <button
+              type="button"
+              onClick={() => setRole('buyer')}
+              style={{
+                ...styles.gatewayRoleBtn,
+                backgroundColor: role === 'buyer' ? 'var(--forest-green)' : 'transparent',
+                color: role === 'buyer' ? 'white' : 'var(--text-secondary)'
+              }}
+            >
+              Buyer Tab
+            </button>
+            <button
+              type="button"
+              onClick={() => setRole('farmer')}
+              style={{
+                ...styles.gatewayRoleBtn,
+                backgroundColor: role === 'farmer' ? 'var(--amber-gold)' : 'transparent',
+                color: role === 'farmer' ? 'white' : 'var(--text-secondary)'
+              }}
+            >
+              Farmer Tab
+            </button>
+          </div>
+        )}
 
         <div style={styles.logoHeader}>
           <Sprout size={36} color={role === 'farmer' ? 'var(--amber-gold)' : 'var(--forest-green)'} />

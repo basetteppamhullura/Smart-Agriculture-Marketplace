@@ -3,6 +3,7 @@ import { useThemeLanguage } from '../context/ThemeLanguageContext';
 import { useAuth } from '../context/AuthContext';
 import { MapPin, Award, Star, ShieldCheck, Sprout, ShoppingBag, Sparkles, CheckCircle, Truck, Trophy } from 'lucide-react';
 import Footer from '../components/Footer';
+import LoginRegister from './LoginRegister';
 
 export default function Home({ onChangeTab }) {
   const { t, language } = useThemeLanguage();
@@ -104,53 +105,12 @@ export default function Home({ onChangeTab }) {
         </div>
       </section>
 
-      {/* Two Separate Visually Attractive Entrance Cards */}
-      <section style={styles.authPortalGrid}>
-        {/* Buyer Section Card */}
-        <div 
-          className="glass-card portal-entrance-card" 
-          style={{ ...styles.portalCard, borderLeft: '5px solid var(--forest-green)' }}
-          onClick={() => onChangeTab('buyer-auth')}
-        >
-          <div style={styles.portalCardIconWrapper}>
-            <ShoppingBag size={24} color="var(--forest-green)" />
-          </div>
-          <h3 style={styles.portalCardTitle}>Buyer Gateway</h3>
-          <p style={styles.portalCardDesc}>
-            Access crop marketplace catalogs, place auction bids, track orders, manage bulk purchase plans, and make secure digital checkouts.
-          </p>
-          <div style={styles.portalActionRow}>
-            <button 
-              className="btn btn-3d-primary"
-              style={{ ...styles.portalBtn, width: '100%' }}
-            >
-              Enter Buyer Portal
-            </button>
-          </div>
-        </div>
-
-        {/* Farmer Section Card */}
-        <div 
-          className="glass-card portal-entrance-card" 
-          style={{ ...styles.portalCard, borderLeft: '5px solid var(--amber-gold)' }}
-          onClick={() => onChangeTab('farmer-auth')}
-        >
-          <div style={styles.portalCardIconWrapper}>
-            <Sprout size={24} color="var(--amber-gold)" />
-          </div>
-          <h3 style={styles.portalCardTitle}>Farmer (Seller) Gateway</h3>
-          <p style={styles.portalCardDesc}>
-            Upload produce images, consult AI pricing models, forecast trends, check plant health, and track digital wallet earnings.
-          </p>
-          <div style={styles.portalActionRow}>
-            <button 
-              className="btn btn-3d-gold"
-              style={{ ...styles.portalBtn, width: '100%' }}
-            >
-              Enter Farmer Portal
-            </button>
-          </div>
-        </div>
+      {/* Single Combined Authentication Portal */}
+      <section style={{ display: 'flex', justifyContent: 'center', padding: '0 20px', marginTop: '-30px', position: 'relative', zIndex: 10 }}>
+        <LoginRegister 
+          onAuthSuccess={() => onChangeTab('dashboard')} 
+          cardStyle={{ width: '100%', maxWidth: '480px', margin: '0 auto' }}
+        />
       </section>
 
       {/* Section 4: Farmer Reputation & Leaderboard */}

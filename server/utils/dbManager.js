@@ -1422,6 +1422,8 @@ const dbManager = {
       writeJson('orders', orders);
       return updatedItem;
     }
+  },
+
   negotiations: {
     find: async (query = {}) => {
       if (!db.useLocalMock()) return await Negotiation.find(query);
