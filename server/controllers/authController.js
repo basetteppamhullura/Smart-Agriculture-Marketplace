@@ -190,6 +190,101 @@ const getAllUsers = async (req, res) => {
   }
 };
 
+// In-memory store for OTPs: { email: { otp: '123456', expiresAt: timestamp } }
+const otpStore = {};
+
+// @desc    Request Forgot Password OTP
+// @route   POST /api/auth/forgot-password
+// @access  Public
+const forgotPassword = async (req, res) => {
+  const { email } = req.body;
+  if (!email) return res.status(400).json({ message: 'Email address is required' });
+
+  try {
+    const user = await dbManager.users.findOne({ email: email.toLowerCase().trim() });
+    if (!user) {
+      return res.status(404).json({ message: 'No registered user found with this email address' });
+    }
+
+    // Generate 6-digit OTP
+    const generatedOtp = Math.floor(100000 + Math.random() * 900000).toString();
+    otpStore[email.toLowerCase().trim()] = {
+      otp: generatedOtp,
+      expiresAt: Date.now() + 10 * 60 * 1000 // 10 minutes expiry
+    };
+
+    console.log(`Forgot Password OTP for ${email}: ${generatedOtp}`);
+
+    res.json({
+      success: true,
+      message: 'OTP verification code has been dispatched to your email address.',
+      otp: generatedOtp // Returned for dev testing convenience
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// @desc    Verify OTP Code
+// @route   POST /api/auth/verify-otp
+// @access  Public
+const verifyOtp = async (req, res) => {
+  const { email, otp } = req.body;
+  if (!email || !otp) return res.status(400).json({ message: 'Email and OTP code are required' });
+
+  const record = otpStore[email.toLowerCase().trim()];
+  if (!record) {
+    return res.status(400).json({ message: 'No active OTP request found. Please request a new code.' });
+  }
+
+  if (Date.now() > record.expiresAt) {
+    delete otpStore[email.toLowerCase().trim()];
+    return res.status(400).json({ message: 'OTP has expired. Please request a new code.' });
+  }
+
+  if (record.otp !== otp.trim()) {
+    return res.status(400).json({ message: 'Invalid OTP code. Please check and try again.' });
+  }
+
+  res.json({
+    success: true,
+    message: 'OTP verified successfully. Proceed to set your new password.'
+  });
+};
+
+// @desc    Reset Password with verified OTP
+// @route   POST /api/auth/reset-password
+// @access  Public
+const resetPassword = async (req, res) => {
+  const { email, otp, newPassword } = req.body;
+  if (!email || !otp || !newPassword) {
+    return res.status(400).json({ message: 'Email, OTP, and new password are required' });
+  }
+
+  const record = otpStore[email.toLowerCase().trim()];
+  if (!record || record.otp !== otp.trim()) {
+    return res.status(400).json({ message: 'Invalid or expired OTP session' });
+  }
+
+  try {
+    const user = await dbManager.users.findOne({ email: email.toLowerCase().trim() });
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+    await dbManager.users.findByIdAndUpdate(user._id, { password: hashedPassword });
+    delete otpStore[email.toLowerCase().trim()];
+
+    res.json({
+      success: true,
+      message: 'Password reset successful! You can now log in with your new password.'
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 module.exports = {
   registerUser,
   loginUser,
@@ -197,5 +292,8 @@ module.exports = {
   verifyFarmer,
   updateWallet,
   toggleFavorite,
-  getAllUsers
+  getAllUsers,
+  forgotPassword,
+  verifyOtp,
+  resetPassword
 };

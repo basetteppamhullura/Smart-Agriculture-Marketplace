@@ -19,6 +19,8 @@ import AiValuationPage from './pages/AiValuationPage';
 import ReputationDashboard from './pages/ReputationDashboard';
 import BuyerFeaturesPage from './pages/BuyerFeaturesPage';
 import FarmerFeaturesPage from './pages/FarmerFeaturesPage';
+import BuyerAuthPage from './pages/BuyerAuthPage';
+import FarmerAuthPage from './pages/FarmerAuthPage';
 
 function MainAppContent() {
   const { user } = useAuth();
@@ -82,6 +84,20 @@ function MainAppContent() {
         return <AiValuationPage />;
       case 'reputation':
         return <ReputationDashboard />;
+      case 'buyer-auth':
+        return (
+          <BuyerAuthPage 
+            onChangeTab={setCurrentTab}
+            onAuthSuccess={() => setCurrentTab('dashboard')} 
+          />
+        );
+      case 'farmer-auth':
+        return (
+          <FarmerAuthPage 
+            onChangeTab={setCurrentTab}
+            onAuthSuccess={() => setCurrentTab('dashboard')} 
+          />
+        );
       case 'buyer-features':
         return (
           <BuyerFeaturesPage 

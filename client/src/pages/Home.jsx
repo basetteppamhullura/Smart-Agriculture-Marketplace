@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useThemeLanguage } from '../context/ThemeLanguageContext';
 import { useAuth } from '../context/AuthContext';
-import { Search, MapPin, Award, Calendar, ChevronRight, Eye, Star, Landmark, TrendingUp, ShieldCheck, Filter, Sprout, ShoppingBag } from 'lucide-react';
+import { MapPin, Award, Star, ShieldCheck, Sprout, ShoppingBag, Sparkles, CheckCircle, Truck, Trophy } from 'lucide-react';
+import Footer from '../components/Footer';
 
 export default function Home({ onChangeTab }) {
   const { t, language } = useThemeLanguage();
@@ -109,7 +110,7 @@ export default function Home({ onChangeTab }) {
         <div 
           className="glass-card portal-entrance-card" 
           style={{ ...styles.portalCard, borderLeft: '5px solid var(--forest-green)' }}
-          onClick={() => onChangeTab('buyer-features')}
+          onClick={() => onChangeTab('buyer-auth')}
         >
           <div style={styles.portalCardIconWrapper}>
             <ShoppingBag size={24} color="var(--forest-green)" />
@@ -123,7 +124,7 @@ export default function Home({ onChangeTab }) {
               className="btn btn-3d-primary"
               style={{ ...styles.portalBtn, width: '100%' }}
             >
-              Explore Buyer Features
+              Enter Buyer Portal
             </button>
           </div>
         </div>
@@ -132,7 +133,7 @@ export default function Home({ onChangeTab }) {
         <div 
           className="glass-card portal-entrance-card" 
           style={{ ...styles.portalCard, borderLeft: '5px solid var(--amber-gold)' }}
-          onClick={() => onChangeTab('farmer-features')}
+          onClick={() => onChangeTab('farmer-auth')}
         >
           <div style={styles.portalCardIconWrapper}>
             <Sprout size={24} color="var(--amber-gold)" />
@@ -146,53 +147,26 @@ export default function Home({ onChangeTab }) {
               className="btn btn-3d-gold"
               style={{ ...styles.portalBtn, width: '100%' }}
             >
-              Explore Farmer Features
+              Enter Farmer Portal
             </button>
           </div>
         </div>
       </section>
 
-      {/* Trust Factors */}
-      <div style={styles.featuresGrid}>
-        <div 
-          className="glass-card feature-3d-card" 
-          style={styles.featureCard}
-          onClick={() => onChangeTab('dashboard')}
-        >
-          <Landmark size={36} color="var(--forest-green)" />
-          <h3>Direct Trade Platform</h3>
-          <p>Bypass middlemen. Trade directly with verified local farmers and receive the best crop valuations without commissions.</p>
-        </div>
-        <div 
-          className="glass-card feature-3d-card" 
-          style={styles.featureCard}
-          onClick={() => onChangeTab('aivaluation')}
-        >
-          <TrendingUp size={36} color="var(--forest-green)" />
-          <h3>AI Valuation Models</h3>
-          <p>Instantly estimate crop prices by parsing historic mandi rates and local crop metrics to support fair trade policies.</p>
-        </div>
-        <div 
-          className="glass-card feature-3d-card" 
-          style={styles.featureCard}
-          onClick={() => onChangeTab('reputation')}
-        >
-          <ShieldCheck size={36} color="var(--forest-green)" />
-          <h3>Reputation Badge Score</h3>
-          <p>Farmers accumulate rating feedback to unlock reputation tiers, securing the verified "Trusted Farmer" badge.</p>
-        </div>
-      </div>
-
-      {/* Featured / Top Farmers Section */}
+      {/* Section 4: Farmer Reputation & Leaderboard */}
       <section style={styles.featuredFarmersSection}>
         <div style={styles.sectionHeaderRow}>
           <div>
-            <h2 style={styles.sectionTitle}>Meet Our Top Farmers</h2>
+            <h2 style={styles.sectionTitle}>Farmer Reputation & Leaderboard</h2>
             <p style={{ fontSize: '13px', color: 'var(--text-secondary)', marginTop: '4px' }}>
-              Real profiles of trusted agricultural producers delivering organic grains and fresh produce.
+              Recognizing top-rated agricultural producers, organic certified sellers, and delivery performance metrics to build buyer trust.
             </p>
           </div>
-          <span className="badge badge-verified" style={{ padding: '6px 14px' }}>Direct Sourced</span>
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+            <span className="badge badge-trusted" style={{ padding: '6px 14px' }}>
+              <Trophy size={12} style={{ marginRight: '4px' }} /> Top Sellers
+            </span>
+          </div>
         </div>
 
         <div style={styles.farmersGrid}>
@@ -201,9 +175,15 @@ export default function Home({ onChangeTab }) {
             const farmersMap = {};
             allCrops.forEach(crop => {
               if (crop.farmer && crop.farmer._id && !farmersMap[crop.farmer._id]) {
+                const rating = crop.farmer.smartFarmingScore?.overallScore || 4.8;
+                let rankBadge = 'Trusted Farmer';
+                if (rating >= 4.7) rankBadge = 'Top Seller';
+                else if (rating >= 4.5) rankBadge = 'Premium Seller';
+
                 farmersMap[crop.farmer._id] = {
                   ...crop.farmer,
                   location: crop.location || 'Karnataka, India',
+                  rankBadge,
                   products: new Set()
                 };
               }
@@ -216,17 +196,20 @@ export default function Home({ onChangeTab }) {
               .slice(0, 4);
 
             if (topFarmers.length === 0) {
-              return <div style={{ color: 'var(--text-secondary)', fontSize: '13px' }}>Loading top farmers...</div>;
+              return <div style={{ color: 'var(--text-secondary)', fontSize: '13px' }}>Loading top seller ratings...</div>;
             }
 
             return topFarmers.map((f, idx) => (
-              <div key={f._id || idx} className="glass-card" style={styles.farmerCard}>
+              <div key={f._id || idx} className="glass-card feature-3d-card" style={styles.farmerCard}>
                 <div style={styles.farmerCardHeader}>
-                  <img 
-                    src={f.avatarUrl || "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=120&q=80"} 
-                    alt={f.name} 
-                    style={styles.farmerAvatar} 
-                  />
+                  <div style={{ position: 'relative' }}>
+                    <img 
+                      src={f.avatarUrl || "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=120&q=80"} 
+                      alt={f.name} 
+                      style={styles.farmerAvatar} 
+                    />
+                    <span style={styles.rankPill}>#{idx + 1}</span>
+                  </div>
                   <div>
                     <h4 style={{ margin: '0 0 2px 0', fontSize: '15px' }}>{f.name}</h4>
                     <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>{f.location}</span>
@@ -238,23 +221,29 @@ export default function Home({ onChangeTab }) {
                     <Star size={13} fill="var(--amber-gold)" color="var(--amber-gold)" />
                     <span style={{ fontWeight: '700', fontSize: '12px' }}>{f.smartFarmingScore?.overallScore || '4.8'}</span>
                   </div>
+                  <span className="badge badge-trusted" style={{ fontSize: '9px', padding: '2px 6px' }}>{f.rankBadge}</span>
                   {f.hasTrustedBadge && (
-                    <span className="badge badge-trusted" style={{ fontSize: '9px', padding: '1px 6px' }}>Trusted</span>
-                  )}
-                  {f.isVerified && (
-                    <span className="badge badge-verified" style={{ fontSize: '9px', padding: '1px 6px' }}>Verified</span>
+                    <span className="badge badge-verified" style={{ fontSize: '9px', padding: '2px 6px' }}>Verified</span>
                   )}
                 </div>
 
+                <div style={styles.metricsRow}>
+                  <div style={styles.metricBox}>
+                    <span style={{ fontSize: '9px', color: 'var(--text-secondary)', textTransform: 'uppercase' }}>Quality Score</span>
+                    <strong style={{ fontSize: '11px', color: 'var(--emerald)' }}>{f.smartFarmingScore?.quality || '4.8'}/5.0</strong>
+                  </div>
+                  <div style={styles.metricBox}>
+                    <span style={{ fontSize: '9px', color: 'var(--text-secondary)', textTransform: 'uppercase' }}>Delivery Perf.</span>
+                    <strong style={{ fontSize: '11px', color: 'var(--forest-green)' }}>{f.smartFarmingScore?.deliveryReliability || '4.9'}/5.0</strong>
+                  </div>
+                </div>
+
                 <div style={styles.farmerProducts}>
-                  <strong style={{ fontSize: '11px', color: 'var(--text-secondary)', textTransform: 'uppercase' }}>Crops Listed:</strong>
+                  <strong style={{ fontSize: '10px', color: 'var(--text-secondary)', textTransform: 'uppercase' }}>Top Produce:</strong>
                   <div style={styles.productsTags}>
                     {Array.from(f.products).slice(0, 3).map((prod, pIdx) => (
                       <span key={pIdx} style={styles.productTag}>{prod}</span>
                     ))}
-                    {f.products.size > 3 && (
-                      <span style={{ fontSize: '11px', color: 'var(--text-secondary)', marginLeft: '4px' }}>+{f.products.size - 3} more</span>
-                    )}
                   </div>
                 </div>
               </div>
@@ -263,214 +252,8 @@ export default function Home({ onChangeTab }) {
         </div>
       </section>
 
-      {/* Dynamic Catalog Section */}
-      <section style={styles.catalogSection}>
-        <h2 style={styles.sectionTitle}>
-          Active Crop Showcase
-        </h2>
-
-        {/* Category Pills Slider */}
-        <div style={styles.categoryPillsWrapper}>
-          <button 
-            onClick={() => setCategory('')}
-            style={{
-              ...styles.pillBtn,
-              backgroundColor: category === '' ? 'var(--forest-green)' : 'var(--bg-secondary)',
-              color: category === '' ? 'white' : 'var(--text-secondary)'
-            }}
-          >
-            All Products
-          </button>
-          {indiaCategories.map((cat, idx) => (
-            <button
-              key={idx}
-              onClick={() => setCategory(cat)}
-              style={{
-                ...styles.pillBtn,
-                backgroundColor: category === cat ? 'var(--forest-green)' : 'var(--bg-secondary)',
-                color: category === cat ? 'white' : 'var(--text-secondary)'
-              }}
-            >
-              {cat}
-            </button>
-          ))}
-        </div>
-
-        {/* Filter & Search Bar Controls */}
-        <div className="glass-card" style={styles.filterControlBar}>
-          <div style={styles.searchBox}>
-            <Search size={18} color="var(--text-secondary)" />
-            <input
-              type="text"
-              placeholder={language === 'kn' ? 'ಕನ್ನಡ ಅಥವಾ ಇಂಗ್ಲಿಷ್‌ನಲ್ಲಿ ಬೆಳೆಗಳನ್ನು ಹುಡುಕಿ...' : 'Search by English or Kannada name...'}
-              style={styles.searchInput}
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
-          </div>
-
-          <div style={styles.filtersGroup}>
-            <div style={styles.sortBox}>
-              <Filter size={16} color="var(--text-secondary)" />
-              <select 
-                className="form-input" 
-                style={styles.sortSelect} 
-                value={sortBy} 
-                onChange={(e) => setSortBy(e.target.value)}
-              >
-                <option value="newest">Sort: New Arrivals</option>
-                <option value="popular">Sort: Most Popular</option>
-                <option value="price-asc">Sort: Price (Low to High)</option>
-                <option value="price-desc">Sort: Price (High to Low)</option>
-                <option value="organic">Sort: Organic Products</option>
-              </select>
-            </div>
-          </div>
-        </div>
-
-        {/* Crop Grid */}
-        {loading ? (
-          <div style={{ textAlign: 'center', padding: '40px' }}>Loading catalog...</div>
-        ) : displayedCrops.length === 0 ? (
-          <div style={styles.emptyCatalog}>No matching products found in the showcase. Try adjusting filters or search text.</div>
-        ) : (
-          <div>
-            <div style={styles.cropsGrid}>
-              {displayedCrops.map((crop) => {
-                const isSoldOut = crop.stockStatus === 'sold-out' || crop.quantity <= 0;
-                return (
-                  <div 
-                    key={crop._id} 
-                    className="glass-card" 
-                    style={{
-                      ...styles.cropCard,
-                      border: '1px solid var(--glass-border)',
-                      boxShadow: 'var(--shadow-md)'
-                    }}
-                  >
-                    {/* Image Panel with Overlays */}
-                    <div style={styles.imagePanel}>
-                      <img src={crop.imageUrl} alt={crop.name} style={styles.cropImg} />
-                      <span className={`badge ${crop.listingMode === 'auction' ? 'badge-auction' : 'badge-buynow'}`} style={styles.modeBadge}>
-                        {crop.listingMode === 'auction' ? 'Auction' : 'Buy Now'}
-                      </span>
-                      {crop.district && (
-                        <span style={styles.districtBadge}>{crop.district}</span>
-                      )}
-                    </div>
-
-                    {/* Card Content details */}
-                    <div style={styles.cropBody}>
-                      <div style={styles.categoryHeader}>
-                        <span style={styles.categoryLabel}>{crop.category}</span>
-                        <span style={{ fontSize: '11px', fontWeight: 'bold', color: crop.qualityGrade === 'Premium' ? 'var(--amber-gold)' : 'var(--emerald)' }}>
-                          Grade {crop.qualityGrade}
-                        </span>
-                      </div>
-
-                      {/* Multilingual Crop Name */}
-                      <h4 style={styles.cropTitle} title={crop.name}>{crop.name}</h4>
-                      {crop.localName && (
-                        <div style={styles.localNameText}>{crop.localName}</div>
-                      )}
-
-                      {/* Farmer rating line */}
-                      <div style={styles.farmerLine}>
-                        <span style={{ fontWeight: '500' }}>{crop.farmer.name}</span>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
-                          <Star size={12} fill="var(--amber-gold)" color="var(--amber-gold)" />
-                          <span style={{ fontWeight: '700', fontSize: '12px' }}>{crop.farmer.smartFarmingScore?.overallScore || '5.0'}</span>
-                        </div>
-                        {crop.farmer.hasTrustedBadge && (
-                          <span className="badge badge-trusted" style={styles.trustedBadge}>Trusted</span>
-                        )}
-                      </div>
-
-                      <div style={styles.specsList}>
-                        <div style={styles.specItem}>
-                          <MapPin size={12} color="var(--text-secondary)" />
-                          <span style={{ fontSize: '11px' }}>
-                            {crop.district ? `${crop.district} (${crop.village || 'Village'})` : crop.location}
-                          </span>
-                        </div>
-                        <div style={styles.specItem}>
-                          <Eye size={12} color="var(--text-secondary)" />
-                          <span>{crop.analytics ? crop.analytics.views : 0} Views</span>
-                        </div>
-                      </div>
-
-                      {/* Pricing Comparison panel */}
-                      <div style={styles.pricingPanel}>
-                        <div style={styles.priceCol}>
-                          <span style={styles.priceLabel}>Selling Price</span>
-                          <strong style={styles.sellingPrice}>Rs {crop.price} / unit</strong>
-                        </div>
-                        <div style={styles.priceCol}>
-                          <span style={styles.priceLabel}>AI Recommended</span>
-                          <span style={styles.aiPrice}>Rs {crop.aiPriceRecommended}</span>
-                        </div>
-                      </div>
-
-                      {/* Stock availability details */}
-                      <div style={styles.availabilityRow}>
-                        <span className={`badge ${isSoldOut ? 'badge-pending' : 'badge-verified'}`} style={{ fontSize: '9px', padding: '2px 8px' }}>
-                          {isSoldOut ? 'SOLD OUT' : 'IN STOCK'}
-                        </span>
-                        <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>
-                          {crop.quantity} kg/units • {crop.deliveryOption === 'farm-pickup' ? 'Pickup' : 'Delivery'}
-                        </span>
-                      </div>
-
-                      {crop.listingMode === 'buynow' ? (
-                        <div style={{ display: 'flex', gap: '8px', marginTop: '10px', width: '100%' }}>
-                          <button 
-                            onClick={() => onChangeTab('dashboard', { action: 'buy', crop })} 
-                            className="btn btn-primary" 
-                            style={{ flex: 1, padding: '8px 6px', fontSize: '11px', fontWeight: 'bold' }}
-                            disabled={isSoldOut}
-                          >
-                            Buy Now
-                          </button>
-                          <button 
-                            onClick={() => onChangeTab('dashboard', { action: 'negotiate', crop })} 
-                            className="btn btn-outline" 
-                            style={{ flex: 1, padding: '8px 6px', fontSize: '11px', fontWeight: 'bold', borderColor: 'var(--amber-gold)', color: 'var(--amber-gold)' }}
-                            disabled={isSoldOut}
-                          >
-                            Negotiate
-                          </button>
-                        </div>
-                      ) : (
-                        <button 
-                          onClick={() => onChangeTab('dashboard', { action: 'buy', crop })} 
-                          className="btn btn-primary" 
-                          style={{ width: '100%', padding: '8px 12px', fontSize: '12px', marginTop: '10px', fontWeight: 'bold' }}
-                          disabled={isSoldOut}
-                        >
-                          Join Auction / Bid
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* View More Pagination */}
-            {filteredCrops.length > visibleCount && (
-              <div style={styles.paginationArea}>
-                <button 
-                  onClick={() => setVisibleCount(prev => prev + 8)}
-                  className="btn btn-primary"
-                  style={{ padding: '12px 35px' }}
-                >
-                  View More Products
-                </button>
-              </div>
-            )}
-          </div>
-        )}
-      </section>
+      {/* Section 5: Footer Section */}
+      <Footer onChangeTab={onChangeTab} />
     </div>
   );
 }

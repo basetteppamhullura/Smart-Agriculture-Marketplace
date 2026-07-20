@@ -2,7 +2,7 @@ import React from 'react';
 import LoginRegister from './LoginRegister';
 import { ShoppingBag, DollarSign, Gavel, Heart, Search, MapPin, History, Star, Calendar, Landmark, ShieldCheck, Lock } from 'lucide-react';
 
-export default function BuyerFeaturesPage({ onChangeTab, onAuthSuccess }) {
+export default function BuyerAuthPage({ onChangeTab, onAuthSuccess }) {
   const features = [
     { title: 'Browse Products', desc: 'Explore fresh, direct farm-listed grains, pulses, and organic vegetables.', icon: ShoppingBag },
     { title: 'Buy Now Option', desc: 'Secure instant buyouts of active inventories at listed mandi direct rates.', icon: DollarSign },
@@ -23,17 +23,17 @@ export default function BuyerFeaturesPage({ onChangeTab, onAuthSuccess }) {
       {/* Header */}
       <div className="glass-card" style={styles.header}>
         <h2 style={{ fontSize: '24px', margin: 0, fontFamily: 'var(--header-font)', color: 'var(--forest-green)' }}>
-          Buyer Gateway Portal
+          Buyer Authentication Gateway
         </h2>
         <p style={{ fontSize: '13px', color: 'var(--text-secondary)', margin: '6px 0 0 0' }}>
-          Explore direct trading, competitive auctions, dynamic bargaining, and end-to-end logistics. Log in below to access product listings.
+          Please log in or register below to access product listings, auctions, and direct trade bargaining.
         </p>
       </div>
 
       <div style={styles.contentLayout}>
-        {/* Left Column: Feature Capabilities */}
+        {/* Left Column: Feature Highlights */}
         <div style={styles.leftCol}>
-          <h3 style={{ fontSize: '18px', margin: '0 0 16px 0', fontFamily: 'var(--header-font)' }}>Buyer Platform Features</h3>
+          <h3 style={{ fontSize: '18px', margin: '0 0 16px 0', fontFamily: 'var(--header-font)' }}>Buyer Platform Capabilities</h3>
           <div style={styles.grid}>
             {features.map((feat, idx) => {
               const Icon = feat.icon;
@@ -52,7 +52,7 @@ export default function BuyerFeaturesPage({ onChangeTab, onAuthSuccess }) {
           </div>
         </div>
 
-        {/* Right Column: Buyer Authentication Gateway (Login | Register | Forgot Password) */}
+        {/* Right Column: Buyer Authentication Form (Login | Register | Forgot Password) */}
         <div style={styles.rightCol}>
           <div style={styles.lockNotice}>
             <Lock size={16} color="var(--forest-green)" />

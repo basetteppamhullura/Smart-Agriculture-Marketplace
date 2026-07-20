@@ -14,10 +14,18 @@
     "crop": "wzgzoq4",
     "durationHours": 24,
     "endTime": "2026-07-20T14:45:47.448Z",
-    "highestBid": 32,
+    "highestBid": 56,
     "bids": [],
     "status": "active",
-    "createdAt": "2026-07-19T14:45:47.450Z"
+    "createdAt": "2026-07-19T14:45:47.450Z",
+    "$push": {
+      "bids": {
+        "buyer": "pyej3x3",
+        "amount": 56,
+        "timestamp": "2026-07-20T06:08:01.998Z"
+      }
+    },
+    "highestBidder": "pyej3x3"
   },
   {
     "_id": "p908fww",

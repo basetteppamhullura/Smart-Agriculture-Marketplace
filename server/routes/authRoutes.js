@@ -7,12 +7,18 @@ const {
   verifyFarmer, 
   updateWallet, 
   toggleFavorite,
-  getAllUsers
+  getAllUsers,
+  forgotPassword,
+  verifyOtp,
+  resetPassword
 } = require('../controllers/authController');
 const { protect, authorize } = require('../middleware/authMiddleware');
 
 router.post('/register', registerUser);
 router.post('/login', loginUser);
+router.post('/forgot-password', forgotPassword);
+router.post('/verify-otp', verifyOtp);
+router.post('/reset-password', resetPassword);
 router.get('/me', protect, getMe);
 router.post('/wallet', protect, updateWallet);
 router.post('/favorite/:id', protect, toggleFavorite);

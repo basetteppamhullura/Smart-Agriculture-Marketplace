@@ -2,7 +2,7 @@ import React from 'react';
 import LoginRegister from './LoginRegister';
 import { Sprout, LayoutGrid, Image, Sparkles, TrendingUp, Gavel, Landmark, BarChart3, Wallet, Award, Brain, CloudRain, ShieldCheck, Truck, Lock } from 'lucide-react';
 
-export default function FarmerFeaturesPage({ onChangeTab, onAuthSuccess }) {
+export default function FarmerAuthPage({ onChangeTab, onAuthSuccess }) {
   const features = [
     { title: 'Farmer Registration & Login', desc: 'Secure verification portal to access listing dashboards.', icon: Sprout },
     { title: 'Add & Manage Products', desc: 'Easily list active crop inventories, set minimum prices, and edit details.', icon: LayoutGrid },
@@ -25,17 +25,17 @@ export default function FarmerFeaturesPage({ onChangeTab, onAuthSuccess }) {
       {/* Header */}
       <div className="glass-card" style={styles.header}>
         <h2 style={{ fontSize: '24px', margin: 0, fontFamily: 'var(--header-font)', color: 'var(--amber-gold)' }}>
-          Farmer Gateway Portal
+          Farmer Authentication Gateway
         </h2>
         <p style={{ fontSize: '13px', color: 'var(--text-secondary)', margin: '6px 0 0 0' }}>
-          Explore digital crop listings, AI recommendations, live bidding rooms, and plant health diagnostics. Log in below to manage your farm.
+          Please log in or register below to publish listings, consult AI price models, and check digital wallet earnings.
         </p>
       </div>
 
       <div style={styles.contentLayout}>
-        {/* Left Column: Feature Capabilities */}
+        {/* Left Column: Feature Highlights */}
         <div style={styles.leftCol}>
-          <h3 style={{ fontSize: '18px', margin: '0 0 16px 0', fontFamily: 'var(--header-font)' }}>Farmer Platform Features</h3>
+          <h3 style={{ fontSize: '18px', margin: '0 0 16px 0', fontFamily: 'var(--header-font)' }}>Farmer Platform Capabilities</h3>
           <div style={styles.grid}>
             {features.map((feat, idx) => {
               const Icon = feat.icon;
@@ -54,7 +54,7 @@ export default function FarmerFeaturesPage({ onChangeTab, onAuthSuccess }) {
           </div>
         </div>
 
-        {/* Right Column: Farmer Authentication Gateway (Login | Register | Forgot Password) */}
+        {/* Right Column: Farmer Authentication Form (Login | Register | Forgot Password) */}
         <div style={styles.rightCol}>
           <div style={styles.lockNotice}>
             <Lock size={16} color="var(--amber-gold)" />
