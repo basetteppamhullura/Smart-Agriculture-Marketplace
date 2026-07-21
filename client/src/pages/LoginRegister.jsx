@@ -177,8 +177,12 @@ export default function LoginRegister({ onAuthSuccess, initialTab = 'login', ini
         )}
 
         <div style={styles.logoHeader}>
-          <Sprout size={36} color={role === 'farmer' ? 'var(--amber-gold)' : 'var(--forest-green)'} />
-          <h2 style={{ fontSize: '22px', margin: '8px 0 2px 0', fontFamily: 'var(--header-font)' }}>
+          <img 
+            src="/logo.jpg" 
+            alt="Smart Agriculture Marketplace Official Logo" 
+            style={{ height: '64px', width: 'auto', borderRadius: '8px', boxShadow: '0 4px 12px rgba(0,0,0,0.2)', marginBottom: '8px' }} 
+          />
+          <h2 style={{ fontSize: '22px', margin: '4px 0 2px 0', fontFamily: 'var(--header-font)' }}>
             {role === 'buyer' ? 'Buyer Authentication Portal' : 'Farmer Authentication Portal'}
           </h2>
           <p style={{ fontSize: '12px', color: 'var(--text-secondary)', margin: 0 }}>

@@ -475,3 +475,74 @@ h1, h2, h3, h4, h5, h6 {
   box-shadow: 0 0px 0 var(--border-color),
               0 2px 4px rgba(0,0,0,0.02);
 }
+
+/* Header Horizontal Navigation Animations & Responsive Rules */
+.header-nav-pill {
+  transition: transform 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+}
+
+.header-nav-pill:hover {
+  transform: translateY(-2px);
+  background-color: var(--green-glow) !important;
+}
+
+.header-horizontal-nav::-webkit-scrollbar {
+  display: none;
+}
+
+@media (max-width: 1200px) {
+  .header-horizontal-nav {
+    display: none !important;
+  }
+
+  .mobile-hamburger-btn {
+    display: flex !important;
+  }
+}
+
+/* Full-Screen Hero Fade-in Animations & Scroll Indicator */
+@keyframes heroFadeUp {
+  0% {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.hero-animate-1 {
+  animation: heroFadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.hero-animate-2 {
+  animation: heroFadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.2s forwards;
+  opacity: 0;
+}
+
+.hero-animate-3 {
+  animation: heroFadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.4s forwards;
+  opacity: 0;
+}
+
+.hero-animate-4 {
+  animation: heroFadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.6s forwards;
+  opacity: 0;
+}
+
+@keyframes bounceDown {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(8px);
+  }
+  60% {
+    transform: translateY(4px);
+  }
+}
+
+.scroll-indicator-bounce {
+  animation: bounceDown 2s infinite;
+}

@@ -10,11 +10,11 @@ export default function Sidebar({ currentTab, onChangeTab }) {
   const menuItems = [
     { id: 'home', label: t('navHome'), icon: Home },
     { id: 'dashboard', label: t('navDashboard'), icon: LayoutDashboard, requiresAuth: true },
-    { id: 'aivaluation', label: 'AI Crop Valuation', icon: Brain },
-    { id: 'reputation', label: 'Farmer Reputation', icon: Award },
-    { id: 'logistics', label: t('navLogistics'), icon: Truck },
-    { id: 'finance', label: t('navFinance'), icon: Landmark },
-    { id: 'infohub', label: t('navInfoHub'), icon: BookOpen }
+    { id: 'aivaluation', label: 'AI Crop Valuation', icon: Brain, requiresAuth: true },
+    { id: 'reputation', label: 'Farmer Reputation', icon: Award, requiresAuth: true },
+    { id: 'logistics', label: t('navLogistics'), icon: Truck, requiresAuth: true },
+    { id: 'finance', label: t('navFinance'), icon: Landmark, requiresAuth: true },
+    { id: 'infohub', label: t('navInfoHub'), icon: BookOpen, requiresAuth: true }
   ];
 
   return (

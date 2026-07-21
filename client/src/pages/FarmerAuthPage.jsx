@@ -63,6 +63,7 @@ export default function FarmerAuthPage({ onChangeTab, onAuthSuccess }) {
           <LoginRegister 
             initialTab="login" 
             initialRole="farmer" 
+            lockRole={true}
             onAuthSuccess={() => {
               if (onAuthSuccess) onAuthSuccess();
               else onChangeTab('dashboard');

@@ -71,7 +71,10 @@ export default function Footer({ onChangeTab }) {
 
       {/* Sub-footer Copyright */}
       <div style={styles.copyrightRow}>
-        <span>© 2026 Smart Agriculture Marketplace (SAM). All Rights Reserved.</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <img src="/logo.jpg" alt="SAM Logo" style={{ height: '28px', width: 'auto', borderRadius: '4px' }} />
+          <span>© 2026 Smart Agriculture Marketplace (SAM). All Rights Reserved.</span>
+        </div>
         <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>Direct Farmer-to-Buyer Trade Portal</span>
       </div>
     </footer>

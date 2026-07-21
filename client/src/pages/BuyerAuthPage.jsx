@@ -61,6 +61,7 @@ export default function BuyerAuthPage({ onChangeTab, onAuthSuccess }) {
           <LoginRegister 
             initialTab="login" 
             initialRole="buyer" 
+            lockRole={true}
             onAuthSuccess={() => {
               if (onAuthSuccess) onAuthSuccess();
               else onChangeTab('dashboard');

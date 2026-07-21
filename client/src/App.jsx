@@ -33,6 +33,31 @@ function MainAppContent() {
 
   // Router matching active tab to page component
   const renderActivePage = () => {
+    // Auth redirect helper for protected routes
+    const renderProtected = (Component, roleRequirement = null) => {
+      if (!user) {
+        return (
+          <LoginRegister 
+            initialTab={authInitialTab}
+            initialRole={authInitialRole}
+            onAuthSuccess={() => setCurrentTab('dashboard')} 
+          />
+        );
+      }
+      if (roleRequirement && user.role !== roleRequirement && user.role !== 'admin') {
+        return (
+          <div style={{ padding: '40px', textAlign: 'center' }}>
+            <h2>Access Restricted</h2>
+            <p>This page is intended for {roleRequirement} accounts.</p>
+            <button className="btn btn-3d-primary" onClick={() => setCurrentTab('dashboard')}>
+              Return to My Dashboard
+            </button>
+          </div>
+        );
+      }
+      return Component;
+    };
+
     switch (currentTab) {
       case 'home':
         return (
@@ -50,6 +75,7 @@ function MainAppContent() {
           />
         );
       case 'login':
+        if (user) return renderProtected(user.role === 'farmer' ? <FarmerDashboard /> : <BuyerDashboard />);
         return (
           <LoginRegister 
             initialTab={authInitialTab}
@@ -75,16 +101,17 @@ function MainAppContent() {
         if (user.role === 'admin') return <AdminDashboard />;
         return <div style={{ padding: '20px' }}>Dashboard type not supported.</div>;
       case 'logistics':
-        return <LogisticsHub />;
+        return renderProtected(<LogisticsHub />);
       case 'finance':
-        return <FinancialTools />;
+        return renderProtected(<FinancialTools />);
       case 'infohub':
-        return <InfoHub />;
+        return renderProtected(<InfoHub />);
       case 'aivaluation':
-        return <AiValuationPage />;
+        return renderProtected(<AiValuationPage />);
       case 'reputation':
-        return <ReputationDashboard />;
+        return renderProtected(<ReputationDashboard />);
       case 'buyer-auth':
+        if (user) return renderProtected(<BuyerDashboard actionPayload={buyerDashboardAction} clearActionPayload={() => setBuyerDashboardAction(null)} />);
         return (
           <BuyerAuthPage 
             onChangeTab={setCurrentTab}
@@ -92,6 +119,7 @@ function MainAppContent() {
           />
         );
       case 'farmer-auth':
+        if (user) return renderProtected(<FarmerDashboard />);
         return (
           <FarmerAuthPage 
             onChangeTab={setCurrentTab}
@@ -138,14 +166,16 @@ function MainAppContent() {
 
       {/* Main Layout containing Sidebar and central content wrapper */}
       <div className="main-layout">
-        {/* Render Sidebar only if user is logged in or checks features */}
-        <Sidebar currentTab={currentTab} onChangeTab={setCurrentTab} />
-        
-        {/* Side space padding so absolute sidebar does not overlap contents */}
-        <div className="sidebar-spacer"></div>
+        {/* Render global Sidebar only for non-home pages */}
+        {currentTab !== 'home' && (
+          <>
+            <Sidebar currentTab={currentTab} onChangeTab={setCurrentTab} />
+            <div className="sidebar-spacer"></div>
+          </>
+        )}
 
         {/* Dynamic page container */}
-        <main className="content-container">
+        <main className="content-container" style={{ padding: currentTab === 'home' ? 0 : undefined }}>
           {renderActivePage()}
         </main>
       </div>
