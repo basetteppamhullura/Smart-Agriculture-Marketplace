@@ -4,9 +4,9 @@ import { useThemeLanguage } from '../context/ThemeLanguageContext';
 import ProductReviewsSection from '../components/ProductReviewsSection';
 import NegotiationModal from '../components/NegotiationModal';
 import BargainingHub from '../components/BargainingHub';
-import { Search, MapPin, Award, Calendar, DollarSign, Heart, ShoppingBag, Bell, Star, Navigation, Clock, Truck, ChevronRight } from 'lucide-react';
+import { Search, MapPin, Award, Calendar, DollarSign, Heart, ShoppingBag, Bell, Star, Navigation, Clock, Truck, ChevronRight, Brain, Landmark, BookOpen } from 'lucide-react';
 
-export default function BuyerDashboard({ actionPayload, clearActionPayload }) {
+export default function BuyerDashboard({ actionPayload, clearActionPayload, onChangeTab }) {
   const { user, toggleFavorite, apiUrl } = useAuth();
   const { t } = useThemeLanguage();
 
@@ -234,6 +234,49 @@ export default function BuyerDashboard({ actionPayload, clearActionPayload }) {
         <p style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
           Browse all active crops and agricultural equipment in the showcase, place bids, or subscribe for boxes.
         </p>
+      </div>
+
+      {/* Platform Feature Hub Cards */}
+      <div style={styles.featureHubGrid}>
+        <div className="glass-card feature-3d-card" style={styles.featureHubCard} onClick={() => onChangeTab && onChangeTab('aivaluation')}>
+          <div style={styles.featureIconBox}><Brain size={18} color="var(--forest-green)" /></div>
+          <div>
+            <h4 style={styles.featureHubTitle}>AI Crop Valuation</h4>
+            <p style={styles.featureHubDesc}>AI price guidance & crop quality analysis</p>
+          </div>
+        </div>
+
+        <div className="glass-card feature-3d-card" style={styles.featureHubCard} onClick={() => onChangeTab && onChangeTab('reputation')}>
+          <div style={{ ...styles.featureIconBox, backgroundColor: 'rgba(217, 119, 6, 0.15)' }}><Award size={18} color="var(--amber-gold)" /></div>
+          <div>
+            <h4 style={styles.featureHubTitle}>Farmer Reputation</h4>
+            <p style={styles.featureHubDesc}>Leaderboard & seller trust scores</p>
+          </div>
+        </div>
+
+        <div className="glass-card feature-3d-card" style={styles.featureHubCard} onClick={() => onChangeTab && onChangeTab('logistics')}>
+          <div style={styles.featureIconBox}><Truck size={18} color="var(--forest-green)" /></div>
+          <div>
+            <h4 style={styles.featureHubTitle}>Logistics & Storage</h4>
+            <p style={styles.featureHubDesc}>Cold chain, transport & shipment tracking</p>
+          </div>
+        </div>
+
+        <div className="glass-card feature-3d-card" style={styles.featureHubCard} onClick={() => onChangeTab && onChangeTab('finance')}>
+          <div style={{ ...styles.featureIconBox, backgroundColor: 'rgba(217, 119, 6, 0.15)' }}><Landmark size={18} color="var(--amber-gold)" /></div>
+          <div>
+            <h4 style={styles.featureHubTitle}>Financial Tools</h4>
+            <p style={styles.featureHubDesc}>Escrow payouts & Kisan credit</p>
+          </div>
+        </div>
+
+        <div className="glass-card feature-3d-card" style={styles.featureHubCard} onClick={() => onChangeTab && onChangeTab('infohub')}>
+          <div style={styles.featureIconBox}><BookOpen size={18} color="var(--forest-green)" /></div>
+          <div>
+            <h4 style={styles.featureHubTitle}>Information Hub</h4>
+            <p style={styles.featureHubDesc}>Govt schemes & Agrarian tips</p>
+          </div>
+        </div>
       </div>
 
       {/* Sub tabs */}
@@ -905,5 +948,41 @@ const styles = {
     borderRadius: '8px',
     marginBottom: '15px',
     fontSize: '14px'
+  },
+  featureHubGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))',
+    gap: '14px',
+    marginBottom: '20px'
+  },
+  featureHubCard: {
+    padding: '14px',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '12px',
+    cursor: 'pointer',
+    transition: 'transform 0.2s ease, box-shadow 0.2s ease'
+  },
+  featureIconBox: {
+    width: '34px',
+    height: '34px',
+    borderRadius: '8px',
+    backgroundColor: 'var(--green-glow)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexShrink: 0
+  },
+  featureHubTitle: {
+    fontSize: '13px',
+    fontWeight: '700',
+    color: 'var(--text-primary)',
+    margin: '0 0 2px 0'
+  },
+  featureHubDesc: {
+    fontSize: '11px',
+    color: 'var(--text-secondary)',
+    margin: 0,
+    lineHeight: '1.3'
   }
 };

@@ -3,9 +3,9 @@ import { useAuth } from '../context/AuthContext';
 import { useThemeLanguage } from '../context/ThemeLanguageContext';
 import AnalyticsChart from '../components/AnalyticsChart';
 import BargainingHub from '../components/BargainingHub';
-import { Plus, Check, DollarSign, Wallet, Sprout, TrendingUp, Info, Edit, Trash2, ShieldAlert, Eye, ShoppingCart, Ban, Award } from 'lucide-react';
+import { Plus, Check, DollarSign, Wallet, Sprout, TrendingUp, Info, Edit, Trash2, ShieldAlert, Eye, ShoppingCart, Ban, Award, Brain, Truck, Landmark, BookOpen } from 'lucide-react';
 
-export default function FarmerDashboard() {
+export default function FarmerDashboard({ onChangeTab }) {
   const { user, apiUrl } = useAuth();
   const { t } = useThemeLanguage();
 
@@ -322,6 +322,49 @@ export default function FarmerDashboard() {
         <p style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
           Welcome, {user.name}! List new products in the showcase, review active auctions, and check your organic certifications.
         </p>
+      </div>
+
+      {/* Platform Feature Hub Cards */}
+      <div style={styles.featureHubGrid}>
+        <div className="glass-card feature-3d-card" style={styles.featureHubCard} onClick={() => onChangeTab && onChangeTab('aivaluation')}>
+          <div style={styles.featureIconBox}><Brain size={18} color="var(--forest-green)" /></div>
+          <div>
+            <h4 style={styles.featureHubTitle}>AI Crop Valuation</h4>
+            <p style={styles.featureHubDesc}>AI pricing calculator & crop disease scanner</p>
+          </div>
+        </div>
+
+        <div className="glass-card feature-3d-card" style={styles.featureHubCard} onClick={() => onChangeTab && onChangeTab('reputation')}>
+          <div style={{ ...styles.featureIconBox, backgroundColor: 'rgba(217, 119, 6, 0.15)' }}><Award size={18} color="var(--amber-gold)" /></div>
+          <div>
+            <h4 style={styles.featureHubTitle}>Farmer Reputation</h4>
+            <p style={styles.featureHubDesc}>Leaderboard rank & smart trust score</p>
+          </div>
+        </div>
+
+        <div className="glass-card feature-3d-card" style={styles.featureHubCard} onClick={() => onChangeTab && onChangeTab('logistics')}>
+          <div style={styles.featureIconBox}><Truck size={18} color="var(--forest-green)" /></div>
+          <div>
+            <h4 style={styles.featureHubTitle}>Logistics & Storage</h4>
+            <p style={styles.featureHubDesc}>Cold chain, transport & pickup requests</p>
+          </div>
+        </div>
+
+        <div className="glass-card feature-3d-card" style={styles.featureHubCard} onClick={() => onChangeTab && onChangeTab('finance')}>
+          <div style={{ ...styles.featureIconBox, backgroundColor: 'rgba(217, 119, 6, 0.15)' }}><Landmark size={18} color="var(--amber-gold)" /></div>
+          <div>
+            <h4 style={styles.featureHubTitle}>Financial Tools</h4>
+            <p style={styles.featureHubDesc}>Kisan credit, subsidies & digital wallet</p>
+          </div>
+        </div>
+
+        <div className="glass-card feature-3d-card" style={styles.featureHubCard} onClick={() => onChangeTab && onChangeTab('infohub')}>
+          <div style={styles.featureIconBox}><BookOpen size={18} color="var(--forest-green)" /></div>
+          <div>
+            <h4 style={styles.featureHubTitle}>Information Hub</h4>
+            <p style={styles.featureHubDesc}>PM-KISAN schemes & farming tips</p>
+          </div>
+        </div>
       </div>
 
       {/* Sub tabs */}
@@ -1013,5 +1056,41 @@ const styles = {
     padding: '14px 12px',
     fontSize: '13px',
     color: 'var(--text-primary)'
+  },
+  featureHubGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))',
+    gap: '14px',
+    marginBottom: '20px'
+  },
+  featureHubCard: {
+    padding: '14px',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '12px',
+    cursor: 'pointer',
+    transition: 'transform 0.2s ease, box-shadow 0.2s ease'
+  },
+  featureIconBox: {
+    width: '34px',
+    height: '34px',
+    borderRadius: '8px',
+    backgroundColor: 'var(--green-glow)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexShrink: 0
+  },
+  featureHubTitle: {
+    fontSize: '13px',
+    fontWeight: '700',
+    color: 'var(--text-primary)',
+    margin: '0 0 2px 0'
+  },
+  featureHubDesc: {
+    fontSize: '11px',
+    color: 'var(--text-secondary)',
+    margin: 0,
+    lineHeight: '1.3'
   }
 };

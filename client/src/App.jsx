@@ -91,11 +91,12 @@ function MainAppContent() {
             onAuthSuccess={() => setCurrentTab('dashboard')} 
           />
         );
-        if (user.role === 'farmer') return <FarmerDashboard />;
+        if (user.role === 'farmer') return <FarmerDashboard onChangeTab={setCurrentTab} />;
         if (user.role === 'buyer') return (
           <BuyerDashboard 
             actionPayload={buyerDashboardAction} 
             clearActionPayload={() => setBuyerDashboardAction(null)} 
+            onChangeTab={setCurrentTab}
           />
         );
         if (user.role === 'admin') return <AdminDashboard />;
@@ -111,7 +112,7 @@ function MainAppContent() {
       case 'reputation':
         return renderProtected(<ReputationDashboard />);
       case 'buyer-auth':
-        if (user) return renderProtected(<BuyerDashboard actionPayload={buyerDashboardAction} clearActionPayload={() => setBuyerDashboardAction(null)} />);
+        if (user) return renderProtected(<BuyerDashboard actionPayload={buyerDashboardAction} clearActionPayload={() => setBuyerDashboardAction(null)} onChangeTab={setCurrentTab} />);
         return (
           <BuyerAuthPage 
             onChangeTab={setCurrentTab}
@@ -119,7 +120,7 @@ function MainAppContent() {
           />
         );
       case 'farmer-auth':
-        if (user) return renderProtected(<FarmerDashboard />);
+        if (user) return renderProtected(<FarmerDashboard onChangeTab={setCurrentTab} />);
         return (
           <FarmerAuthPage 
             onChangeTab={setCurrentTab}
@@ -164,18 +165,10 @@ function MainAppContent() {
         onChangeTab={setCurrentTab} 
       />
 
-      {/* Main Layout containing Sidebar and central content wrapper */}
+      {/* Main Layout containing central content wrapper */}
       <div className="main-layout">
-        {/* Render global Sidebar only for non-home pages */}
-        {currentTab !== 'home' && (
-          <>
-            <Sidebar currentTab={currentTab} onChangeTab={setCurrentTab} />
-            <div className="sidebar-spacer"></div>
-          </>
-        )}
-
         {/* Dynamic page container */}
-        <main className="content-container" style={{ padding: currentTab === 'home' ? 0 : undefined }}>
+        <main className="content-container" style={{ padding: 0 }}>
           {renderActivePage()}
         </main>
       </div>
