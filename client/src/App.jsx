@@ -128,7 +128,7 @@ function MainAppContent() {
           />
         );
       case 'buyer-features':
-        return (
+        return renderProtected(
           <BuyerFeaturesPage 
             onChangeTab={(tab, payload) => {
               if (tab === 'login' && payload) {
@@ -140,7 +140,7 @@ function MainAppContent() {
           />
         );
       case 'farmer-features':
-        return (
+        return renderProtected(
           <FarmerFeaturesPage 
             onChangeTab={(tab, payload) => {
               if (tab === 'login' && payload) {
