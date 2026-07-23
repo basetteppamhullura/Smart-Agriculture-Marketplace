@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useThemeLanguage } from '../context/ThemeLanguageContext';
 import { BookOpen, CloudRain, ShieldCheck, PlayCircle, HelpCircle, AlertTriangle, FileSpreadsheet, Loader2 } from 'lucide-react';
+import MandiMarketPrices from '../components/MandiMarketPrices';
 
 export default function InfoHub() {
   const { apiUrl } = useAuth();
@@ -197,36 +198,8 @@ export default function InfoHub() {
 
       {/* RENDER MARKET PRICES */}
       {activeSubTab === 'prices' && (
-        <div style={styles.tabContent} className="glass-card">
-          <div style={styles.priceHeaderRow}>
-            <h3 style={{ fontSize: '18px' }}>Daily Mandi Market Price Index</h3>
-            <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Updated: Today, 08:00 AM</span>
-          </div>
-
-          <div style={{ overflowX: 'auto', marginTop: '15px' }}>
-            <table style={styles.table}>
-              <thead>
-                <tr style={styles.tableHeaderRow}>
-                  <th style={styles.th}>Crop Name</th>
-                  <th style={styles.th}>State / Market</th>
-                  <th style={styles.th}>Min Rate (Rs/q)</th>
-                  <th style={styles.th}>Max Rate (Rs/q)</th>
-                  <th style={styles.th}>Mandi Average</th>
-                </tr>
-              </thead>
-              <tbody>
-                {mandiPrices.map((p, idx) => (
-                  <tr key={idx} style={styles.tableRow}>
-                    <td style={styles.td}><strong>{p.crop}</strong></td>
-                    <td style={styles.td}>{p.state}</td>
-                    <td style={styles.td}>Rs {p.min}</td>
-                    <td style={styles.td}>Rs {p.max}</td>
-                    <td style={{ ...styles.td, color: 'var(--forest-green)', fontWeight: '600' }}>Rs {p.avg} / quintal</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+        <div style={styles.tabContent}>
+          <MandiMarketPrices />
         </div>
       )}
 

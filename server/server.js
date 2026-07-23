@@ -20,6 +20,7 @@ app.use('/api/auctions', require('./routes/auctionRoutes'));
 app.use('/api/orders', require('./routes/orderRoutes'));
 app.use('/api/ai', require('./routes/aiRoutes'));
 app.use('/api/negotiations', require('./routes/negotiationRoutes'));
+app.use('/api/mandi-prices', require('./routes/mandiRoutes'));
 
 // Basic health check
 app.get('/health', (req, res) => {

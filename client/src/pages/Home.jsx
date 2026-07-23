@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import Footer from '../components/Footer';
 import LoginRegister from './LoginRegister';
+import MandiMarketPrices from '../components/MandiMarketPrices';
 
 export default function Home({ onChangeTab }) {
   const { t, language } = useThemeLanguage();
@@ -468,46 +469,7 @@ export default function Home({ onChangeTab }) {
 
       {/* 8. MARKET PRICES SECTION */}
       <section id="market-prices" style={styles.sectionContainer}>
-        <div style={styles.sectionHeader}>
-          <div style={styles.iconTag}><TrendingUp size={18} color="var(--amber-gold)" /></div>
-          <div>
-            <h2 style={styles.sectionTitle}>Live Mandi Market Price Benchmark</h2>
-            <p style={styles.sectionSubtitle}>Daily spot commodity benchmark rates updated from regional Karnataka Mandis.</p>
-          </div>
-        </div>
-
-        <div className="glass-card" style={{ padding: '20px', overflowX: 'auto' }}>
-          <table style={styles.priceTable}>
-            <thead>
-              <tr style={styles.tableHeadRow}>
-                <th style={styles.th}>Crop Produce</th>
-                <th style={styles.th}>Category</th>
-                <th style={styles.th}>Regional Mandi</th>
-                <th style={styles.th}>Spot Benchmark Price</th>
-                <th style={styles.th}>24h Trend</th>
-              </tr>
-            </thead>
-            <tbody>
-              {marketPriceData.map((row, idx) => (
-                <tr key={idx} style={styles.tableRow}>
-                  <td style={{ ...styles.td, fontWeight: '700' }}>{row.crop}</td>
-                  <td style={styles.td}><span className="badge" style={{ fontSize: '10px' }}>{row.category}</span></td>
-                  <td style={styles.td}>{row.mandi}</td>
-                  <td style={{ ...styles.td, fontWeight: '700', color: 'var(--forest-green)' }}>{row.price}</td>
-                  <td style={styles.td}>
-                    <span style={{ 
-                      color: row.trend === 'up' ? 'var(--emerald)' : row.trend === 'down' ? '#ef4444' : 'var(--text-secondary)',
-                      fontWeight: '700',
-                      fontSize: '12px' 
-                    }}>
-                      {row.trend === 'up' ? '▲ ' : row.trend === 'down' ? '▼ ' : '• '} {row.change}
-                    </span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <MandiMarketPrices />
       </section>
 
       {/* 9. HELP & SUPPORT SECTION */}
