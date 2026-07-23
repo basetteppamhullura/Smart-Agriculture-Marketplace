@@ -28,5 +28,35 @@
     },
     "status": "available",
     "createdAt": "2026-07-19T14:47:04.238Z"
+  },
+  {
+    "_id": "wahpugt",
+    "farmer": "xoj9qe2",
+    "name": "green grain ",
+    "localName": "hesaru",
+    "category": "Grains",
+    "quantity": 200,
+    "qualityGrade": "A",
+    "harvestDate": "2026-07-23T14:49:29.855Z",
+    "location": "gadag, Karnataka",
+    "district": "Dharwad",
+    "village": "kotabal",
+    "listingMode": "buynow",
+    "price": 34,
+    "aiPriceRecommended": 35,
+    "imageUrl": "url1",
+    "images": [
+      "url1"
+    ],
+    "stockStatus": "in-stock",
+    "deliveryOption": "logistics-delivery",
+    "description": "it is a good product\n",
+    "analytics": {
+      "views": 0,
+      "ordersCount": 0,
+      "revenue": 0
+    },
+    "status": "available",
+    "createdAt": "2026-07-23T14:49:29.856Z"
   }
 ]

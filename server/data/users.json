@@ -27,5 +27,23 @@
     },
     "hasTrustedBadge": true,
     "walletBalance": 5000
+  },
+  {
+    "_id": "xoj9qe2",
+    "name": "samarth",
+    "email": "chhatrapati9380@gmail.com",
+    "password": "$2a$10$.AOyjeBpPYNvHH8WpXU2/u3kh9HGZ9m0feWNH6Iea8ltBpJQUCcAa",
+    "role": "farmer",
+    "location": "gadag, Karnataka",
+    "language": "en",
+    "smartFarmingScore": {
+      "quality": 4.5,
+      "deliveryReliability": 4.5,
+      "sustainablePractices": 4.5,
+      "priceFairness": 4.5,
+      "overallScore": 4.5
+    },
+    "hasTrustedBadge": true,
+    "walletBalance": 5000
   }
 ]
