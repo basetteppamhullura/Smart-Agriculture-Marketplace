@@ -10,6 +10,9 @@ const Review = require('../models/Review');
 const Question = require('../models/Question');
 const Negotiation = require('../models/Negotiation');
 const Notification = require('../models/Notification');
+const Chat = require('../models/Chat');
+const Payment = require('../models/Payment');
+const Logistics = require('../models/Logistics');
 const { getImageForCrop } = require('./cropImages');
 
 // Simple local JSON db helpers
@@ -1059,6 +1062,9 @@ const seedAllData = async () => {
       writeJson('questions', seedQuestions);
       writeJson('orders', []);
       writeJson('notifications', []);
+      writeJson('chats', []);
+      writeJson('payments', []);
+      writeJson('logistics', []);
       console.log('Local JSON Database Seeded successfully.');
     }
   }
@@ -1579,6 +1585,16 @@ const dbManager = {
         });
         return filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
       },
+      findOne: async (query = {}) => {
+        if (!db.useLocalMock()) return await User.findOne(query);
+        let data = readJson('users');
+        return data.find(item => {
+          for (let k in query) {
+            if (item[k] !== query[k]) return false;
+          }
+          return true;
+        }) || null;
+      },
       findById: async (id) => {
         if (!db.useLocalMock()) return await Notification.findById(id);
         let data = readJson('notifications');
@@ -1628,6 +1644,198 @@ const dbManager = {
         });
         writeJson('notifications', data);
         return { nModified: updatedCount };
+      }
+    },
+
+    chats: {
+      find: async (query = {}) => {
+        if (!db.useLocalMock()) return await Chat.find(query).populate('buyer farmer');
+        let data = readJson('chats');
+        let filtered = data.filter(item => {
+          for (let k in query) {
+            if (item[k] !== query[k]) return false;
+          }
+          return true;
+        });
+        const users = readJson('users');
+        return filtered.map(c => {
+          const buyerUser = users.find(u => u._id === c.buyer) || null;
+          const farmerUser = users.find(u => u._id === c.farmer) || null;
+          return { ...c, buyer: buyerUser, farmer: farmerUser };
+        });
+      },
+      findById: async (id) => {
+        if (!db.useLocalMock()) return await Chat.findById(id).populate('buyer farmer');
+        let data = readJson('chats');
+        const c = data.find(item => item._id === id) || null;
+        if (c) {
+          const users = readJson('users');
+          c.buyer = users.find(u => u._id === c.buyer) || null;
+          c.farmer = users.find(u => u._id === c.farmer) || null;
+        }
+        return c;
+      },
+      findOne: async (query = {}) => {
+        if (!db.useLocalMock()) return await Chat.findOne(query).populate('buyer farmer');
+        let data = readJson('chats');
+        const c = data.find(item => {
+          for (let k in query) {
+            if (item[k] !== query[k]) return false;
+          }
+          return true;
+        }) || null;
+        if (c) {
+          const users = readJson('users');
+          c.buyer = users.find(u => u._id === c.buyer) || null;
+          c.farmer = users.find(u => u._id === c.farmer) || null;
+        }
+        return c;
+      },
+      create: async (doc) => {
+        if (!db.useLocalMock()) return await Chat.create(doc);
+        let data = readJson('chats');
+        const newDoc = { 
+          _id: generateId(), 
+          messages: [],
+          ...doc, 
+          createdAt: new Date().toISOString() 
+        };
+        data.push(newDoc);
+        writeJson('chats', data);
+        return newDoc;
+      },
+      findByIdAndUpdate: async (id, update) => {
+        if (!db.useLocalMock()) return await Chat.findByIdAndUpdate(id, update, { new: true });
+        let data = readJson('chats');
+        let index = data.findIndex(item => item._id === id);
+        if (index === -1) return null;
+        
+        let target = data[index];
+        if (update.$push) {
+          for (let key in update.$push) {
+            if (!target[key]) target[key] = [];
+            target[key].push({
+              _id: generateId(),
+              createdAt: new Date().toISOString(),
+              ...update.$push[key]
+            });
+          }
+        }
+        let directUpdates = { ...update };
+        delete directUpdates.$push;
+        let updatedItem = { ...target, ...directUpdates };
+        
+        data[index] = updatedItem;
+        writeJson('chats', data);
+        return updatedItem;
+      }
+    },
+
+    payments: {
+      find: async (query = {}) => {
+        if (!db.useLocalMock()) return await Payment.find(query);
+        let data = readJson('payments');
+        return data.filter(item => {
+          for (let k in query) {
+            if (item[k] !== query[k]) return false;
+          }
+          return true;
+        });
+      },
+      create: async (doc) => {
+        if (!db.useLocalMock()) return await Payment.create(doc);
+        let data = readJson('payments');
+        const newDoc = { 
+          _id: generateId(), 
+          ...doc, 
+          createdAt: new Date().toISOString() 
+        };
+        data.push(newDoc);
+        writeJson('payments', data);
+        return newDoc;
+      }
+    },
+
+    logistics: {
+      find: async (query = {}) => {
+        if (!db.useLocalMock()) return await Logistics.find(query).populate('order');
+        let data = readJson('logistics');
+        let filtered = data.filter(item => {
+          for (let k in query) {
+            if (item[k] !== query[k]) return false;
+          }
+          return true;
+        });
+        const orders = readJson('orders');
+        return filtered.map(l => {
+          const ord = orders.find(o => o._id === l.order) || null;
+          return { ...l, order: ord };
+        });
+      },
+      findById: async (id) => {
+        if (!db.useLocalMock()) return await Logistics.findById(id).populate('order');
+        let data = readJson('logistics');
+        const l = data.find(item => item._id === id) || null;
+        if (l) {
+          const orders = readJson('orders');
+          l.order = orders.find(o => o._id === l.order) || null;
+        }
+        return l;
+      },
+      findOne: async (query = {}) => {
+        if (!db.useLocalMock()) return await Logistics.findOne(query).populate('order');
+        let data = readJson('logistics');
+        const l = data.find(item => {
+          for (let k in query) {
+            if (item[k] !== query[k]) return false;
+          }
+          return true;
+        }) || null;
+        if (l) {
+          const orders = readJson('orders');
+          l.order = orders.find(o => o._id === l.order) || null;
+        }
+        return l;
+      },
+      create: async (doc) => {
+        if (!db.useLocalMock()) return await Logistics.create(doc);
+        let data = readJson('logistics');
+        const newDoc = { 
+          _id: generateId(), 
+          timeline: [
+            { status: 'assigned', description: 'Logistics cargo driver assigned.', timestamp: new Date().toISOString() }
+          ],
+          ...doc, 
+          createdAt: new Date().toISOString() 
+        };
+        data.push(newDoc);
+        writeJson('logistics', data);
+        return newDoc;
+      },
+      findByIdAndUpdate: async (id, update) => {
+        if (!db.useLocalMock()) return await Logistics.findByIdAndUpdate(id, update, { new: true });
+        let data = readJson('logistics');
+        let index = data.findIndex(item => item._id === id);
+        if (index === -1) return null;
+        
+        let target = data[index];
+        if (update.$push) {
+          for (let key in update.$push) {
+            if (!target[key]) target[key] = [];
+            target[key].push({
+              _id: generateId(),
+              timestamp: new Date().toISOString(),
+              ...update.$push[key]
+            });
+          }
+        }
+        let directUpdates = { ...update };
+        delete directUpdates.$push;
+        let updatedItem = { ...target, ...directUpdates };
+        
+        data[index] = updatedItem;
+        writeJson('logistics', data);
+        return updatedItem;
       }
     }
   }

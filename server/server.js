@@ -24,6 +24,9 @@ app.use('/api/ai', require('./routes/aiRoutes'));
 app.use('/api/negotiations', require('./routes/negotiationRoutes'));
 app.use('/api/mandi-prices', require('./routes/mandiRoutes'));
 app.use('/api/notifications', require('./routes/notificationRoutes'));
+app.use('/api/chats', require('./routes/chatRoutes'));
+app.use('/api/payments', require('./routes/paymentRoutes'));
+app.use('/api/logistics', require('./routes/logisticsRoutes'));
 
 // Basic health check
 app.get('/health', (req, res) => {

@@ -4,6 +4,7 @@ import { useThemeLanguage } from '../context/ThemeLanguageContext';
 import { useSocket } from '../context/SocketContext';
 import AnalyticsChart from '../components/AnalyticsChart';
 import BargainingHub from '../components/BargainingHub';
+import ChatRooms from '../components/ChatRooms';
 import { 
   Plus, Check, DollarSign, Wallet, Sprout, TrendingUp, Info, Edit, Trash2, ShieldAlert, Eye, 
   ShoppingCart, Ban, Award, Brain, Truck, Landmark, BookOpen, Clock, Heart, Star, MapPin, 
@@ -69,6 +70,7 @@ export default function FarmerDashboard({ onChangeTab }) {
   const [durationHours, setDurationHours] = useState('24');
   const [isNegotiationEnabled, setIsNegotiationEnabled] = useState(true);
   const [auctions, setAuctions] = useState([]);
+  const [shipments, setShipments] = useState([]);
 
   const token = localStorage.getItem('sam-token');
 
@@ -221,6 +223,62 @@ export default function FarmerDashboard({ onChangeTab }) {
       console.error('Failed to fetch auctions:', err);
     }
   };
+
+  const fetchShipments = async () => {
+    try {
+      const res = await fetch(`${apiUrl}/logistics/shipments`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setShipments(data);
+      }
+    } catch (err) {
+      console.error('Failed to fetch shipments:', err);
+    }
+  };
+
+  const handleUpdateShipmentStatus = async (shipmentId, currentStatus) => {
+    const nextStatusMap = {
+      'assigned': 'dispatched',
+      'dispatched': 'in-transit',
+      'in-transit': 'delivered'
+    };
+    const nextStatus = nextStatusMap[currentStatus];
+    if (!nextStatus) return;
+
+    if (!window.confirm(`Are you sure you want to update shipping status to ${nextStatus.toUpperCase()}?`)) return;
+
+    try {
+      const res = await fetch(`${apiUrl}/logistics/${shipmentId}/status`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          status: nextStatus,
+          description: `Shipment status updated by farmer to ${nextStatus}.`
+        })
+      });
+
+      if (res.ok) {
+        alert('Shipping status updated successfully!');
+        fetchShipments();
+      } else {
+        const err = await res.json();
+        alert(err.message || 'Failed to update status');
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  useEffect(() => {
+    if (activeSubTab === 'logistics') {
+      fetchShipments();
+    }
+  }, [activeSubTab]);
 
   useEffect(() => {
     loadDashboard();
@@ -560,6 +618,17 @@ export default function FarmerDashboard({ onChangeTab }) {
         </button>
 
         <button
+          onClick={() => setActiveSubTab('chats')}
+          style={{
+            ...styles.subTabBtn,
+            backgroundColor: activeSubTab === 'chats' ? 'var(--forest-green)' : 'transparent',
+            color: activeSubTab === 'chats' ? 'white' : 'var(--text-secondary)'
+          }}
+        >
+          B2B Chat Rooms
+        </button>
+
+        <button
           onClick={() => setActiveSubTab('auctions')}
           style={{
             ...styles.subTabBtn,
@@ -732,6 +801,13 @@ export default function FarmerDashboard({ onChangeTab }) {
       {activeSubTab === 'negotiations' && (
         <div className="fade-in" style={{ padding: '10px 0' }}>
           <BargainingHub />
+        </div>
+      )}
+
+      {/* RENDER CHATS TAB */}
+      {activeSubTab === 'chats' && (
+        <div className="fade-in" style={{ padding: '10px 0' }}>
+          <ChatRooms />
         </div>
       )}
 
@@ -926,30 +1002,53 @@ export default function FarmerDashboard({ onChangeTab }) {
         </div>
       )}
 
-      {/* 4. FREIGHT & LOGISTICS TAB (REQUESTED BY USER) */}
+      {/* 4. FREIGHT & LOGISTICS TAB */}
       {activeSubTab === 'logistics' && (
         <div className="glass-card" style={{ padding: '24px' }} className="fade-in">
-          <h3 style={{ margin: '0 0 16px 0', fontSize: '18px' }}>Logistics Freight & Farm Pickup Dispatch</h3>
-
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
-            <div style={styles.logisticsCard}>
-              <Truck size={24} color="var(--forest-green)" />
-              <div>
-                <strong>Reefer Cold Chain Truck (KA-11-AG-4029)</strong>
-                <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: 'var(--text-secondary)' }}>Transport Partner: <strong>AgriFreight Express</strong></p>
-                <div style={{ fontSize: '11px', color: 'var(--emerald)', marginTop: '4px' }}>Expected Pickup: Tomorrow, 09:00 AM • Destination: Bengaluru APMC</div>
-              </div>
-            </div>
-
-            <div style={styles.logisticsCard}>
-              <Truck size={24} color="var(--forest-green)" />
-              <div>
-                <strong>Direct Farm Gate Pickup (KA-09-E-9012)</strong>
-                <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: 'var(--text-secondary)' }}>Transport Partner: <strong>Buyer Self Pickup</strong></p>
-                <div style={{ fontSize: '11px', color: 'var(--emerald)', marginTop: '4px' }}>Expected Pickup: 18 July 2026 • Mandya Farm Yard</div>
-              </div>
-            </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+            <h3 style={{ margin: 0, fontSize: '18px' }}>Logistics Freight & Farm Pickup Dispatch</h3>
+            <button onClick={fetchShipments} className="btn btn-outline" style={{ fontSize: '12px' }}>
+              Refresh Shipments
+            </button>
           </div>
+
+          {shipments.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-secondary)' }}>
+              No active logistics shipments found. Once buyers place bulk escrow orders, they will appear here.
+            </div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              {shipments.map((ship) => (
+                <div key={ship._id} className="glass-card" style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px', border: '1px solid var(--border-color)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-color)', paddingBottom: '8px' }}>
+                    <div>
+                      <strong>Carrier: {ship.partnerName}</strong>
+                      <div style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>
+                        Vehicle: {ship.vehicleNumber} • Driver: {ship.driverName} ({ship.driverPhone})
+                      </div>
+                    </div>
+                    <span className="badge badge-verified" style={{ textTransform: 'capitalize' }}>Status: {ship.status}</span>
+                  </div>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '10px', fontSize: '13px' }}>
+                    <div>Quantity: <strong>{ship.order?.quantity || 0} Quintals</strong></div>
+                    <div>Settled Total: <strong style={{ color: 'var(--forest-green)' }}>₹{ship.order?.totalAmount?.toLocaleString() || 0}</strong></div>
+                    <div>ETA: <strong>{new Date(ship.estimatedDelivery).toLocaleDateString()}</strong></div>
+                  </div>
+
+                  {ship.status !== 'delivered' && (
+                    <button 
+                      onClick={() => handleUpdateShipmentStatus(ship._id, ship.status)}
+                      className="btn btn-primary"
+                      style={{ padding: '8px 16px', fontSize: '12px', alignSelf: 'flex-start', marginTop: '6px' }}
+                    >
+                      Mark as {ship.status === 'assigned' ? 'DISPATCHED' : ship.status === 'dispatched' ? 'IN-TRANSIT' : 'DELIVERED'}
+                    </button>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
 

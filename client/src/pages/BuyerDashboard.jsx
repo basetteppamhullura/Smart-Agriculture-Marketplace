@@ -6,6 +6,7 @@ import b2bDemoCrops from '../data/b2bDemoCrops';
 import ProductReviewsSection from '../components/ProductReviewsSection';
 import NegotiationModal from '../components/NegotiationModal';
 import BargainingHub from '../components/BargainingHub';
+import ChatRooms from '../components/ChatRooms';
 import { 
   Search, MapPin, Award, Calendar, DollarSign, Heart, ShoppingBag, Bell, Star, Navigation, 
   Clock, Truck, ChevronRight, Brain, Landmark, BookOpen, FileText, ShoppingCart, SlidersHorizontal, 
@@ -555,6 +556,17 @@ export default function BuyerDashboard({ actionPayload, clearActionPayload, onCh
         >
           Live Price Auctions ({auctions.filter(a => a.status === 'active').length})
         </button>
+
+        <button
+          onClick={() => setActiveSubTab('chats')}
+          style={{
+            ...styles.subTabBtn,
+            backgroundColor: activeSubTab === 'chats' ? 'var(--forest-green)' : 'transparent',
+            color: activeSubTab === 'chats' ? 'white' : 'var(--text-secondary)'
+          }}
+        >
+          B2B Chat Rooms
+        </button>
       </div>
 
       {/* 2. MAIN B2B MARKETPLACE SHOWCASE */}
@@ -729,7 +741,29 @@ export default function BuyerDashboard({ actionPayload, clearActionPayload, onCh
                           </button>
 
                           <button 
-                            onClick={() => { setContactFarmerCrop(crop); trackRecentlyViewed(crop); }}
+                            onClick={async () => {
+                              // Automatically open or create B2B Chat Room
+                              try {
+                                const res = await fetch(`${apiUrl}/chats/message`, {
+                                  method: 'POST',
+                                  headers: {
+                                    'Content-Type': 'application/json',
+                                    'Authorization': `Bearer ${token}`
+                                  },
+                                  body: JSON.stringify({
+                                    recipientId: crop.farmer._id || crop.farmer,
+                                    text: `Hello! I am interested in your wholesale listing: ${crop.name} at ₹${crop.price}/Quintal.`
+                                  })
+                                });
+                                if (res.ok) {
+                                  setActiveSubTab('chats');
+                                } else {
+                                  alert('Failed to connect to farmer chat.');
+                                }
+                              } catch (err) {
+                                console.error(err);
+                              }
+                            }}
                             className="btn btn-outline"
                             style={{ padding: '7px 10px', fontSize: '11px', borderColor: 'var(--forest-green)', color: 'var(--forest-green)' }}
                             title="Contact Farmer & Negotiate"
@@ -929,6 +963,13 @@ export default function BuyerDashboard({ actionPayload, clearActionPayload, onCh
       {activeSubTab === 'bargains' && (
         <div className="fade-in" style={{ padding: '10px 0' }}>
           <BargainingHub />
+        </div>
+      )}
+
+      {/* RENDER CHATS TAB */}
+      {activeSubTab === 'chats' && (
+        <div className="fade-in" style={{ padding: '10px 0' }}>
+          <ChatRooms />
         </div>
       )}
 
@@ -1175,7 +1216,7 @@ export default function BuyerDashboard({ actionPayload, clearActionPayload, onCh
                     }
                     // Place order
                     try {
-                      const res = await fetch(`${apiUrl}/orders`, {
+                      const res = await fetch(`${apiUrl}/payments/charge`, {
                         method: 'POST',
                         headers: {
                           'Content-Type': 'application/json',
