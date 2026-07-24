@@ -1,18 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useThemeLanguage } from '../context/ThemeLanguageContext';
+import { useSocket } from '../context/SocketContext';
 import { 
   Leaf, Sun, Moon, Wallet, User as UserIcon, LogOut, LogIn, Menu, X,
   Home as HomeIcon, Info, Layers, ShoppingBag, Sprout, Trophy,
-  Landmark, TrendingUp, Headphones, FileQuestion, Mail
+  Landmark, TrendingUp, Headphones, FileQuestion, Mail, Bell
 } from 'lucide-react';
 
 export default function Navbar({ onOpenWallet, currentTab, onChangeTab }) {
   const { user, logout } = useAuth();
   const { theme, toggleTheme, language, changeLanguage, t } = useThemeLanguage();
+  const { notifications, unreadCount, markAsRead, markAllAsRead } = useSocket();
 
   const [activeSection, setActiveSection] = useState('hero');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [showNotifDrawer, setShowNotifDrawer] = useState(false);
 
   // 9 Navigation Items (Auth portals removed from Header Navbar)
   const navItems = [
@@ -151,6 +154,59 @@ export default function Navbar({ onOpenWallet, currentTab, onChangeTab }) {
           >
             {theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
           </button>
+
+          {/* Notification Bell with Badge */}
+          {user && (
+            <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+              <button 
+                onClick={() => setShowNotifDrawer(!showNotifDrawer)} 
+                style={styles.iconButton}
+                className="notif-toggle"
+                title="Notifications"
+              >
+                <Bell size={18} />
+                {unreadCount > 0 && (
+                  <span style={styles.badgeCount}>{unreadCount}</span>
+                )}
+              </button>
+
+              {showNotifDrawer && (
+                <div style={styles.notifDropdown} className="fade-in">
+                  <div style={styles.notifHeader}>
+                    <h4 style={{ margin: 0, fontSize: '13px', fontWeight: 'bold' }}>Notifications</h4>
+                    {unreadCount > 0 && (
+                      <button onClick={markAllAsRead} style={styles.markAllBtn}>
+                        Mark all read
+                      </button>
+                    )}
+                  </div>
+                  <div style={styles.notifList}>
+                    {notifications.length === 0 ? (
+                      <div style={styles.emptyNotif}>No notifications.</div>
+                    ) : (
+                      notifications.slice(0, 10).map(notif => (
+                        <div 
+                          key={notif._id} 
+                          onClick={() => { markAsRead(notif._id); setShowNotifDrawer(false); }}
+                          style={{
+                            ...styles.notifItem,
+                            backgroundColor: notif.read ? 'transparent' : 'rgba(16, 185, 129, 0.08)',
+                            borderLeft: notif.read ? 'none' : '3px solid var(--forest-green)'
+                          }}
+                        >
+                          <div style={styles.notifTitle}>{notif.title}</div>
+                          <div style={styles.notifMsg}>{notif.msg}</div>
+                          <div style={styles.notifTime}>
+                            {new Date(notif.createdAt).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Wallet Connection */}
           {user && (
@@ -400,5 +456,87 @@ const styles = {
     fontSize: '12px',
     cursor: 'pointer',
     textAlign: 'left'
+  },
+  badgeCount: {
+    position: 'absolute',
+    top: '-4px',
+    right: '-4px',
+    backgroundColor: '#ef4444',
+    color: '#ffffff',
+    fontSize: '9px',
+    fontWeight: 'bold',
+    borderRadius: '50%',
+    width: '15px',
+    height: '15px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    border: '1.5px solid var(--bg-secondary)'
+  },
+  notifDropdown: {
+    position: 'absolute',
+    top: '40px',
+    right: 0,
+    width: '300px',
+    maxHeight: '350px',
+    backgroundColor: 'var(--bg-secondary)',
+    border: '1px solid var(--border-color)',
+    borderRadius: '12px',
+    boxShadow: 'var(--shadow-lg)',
+    overflowY: 'auto',
+    zIndex: 1000,
+    padding: '12px'
+  },
+  notifHeader: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    borderBottom: '1px solid var(--border-color)',
+    paddingBottom: '8px',
+    marginBottom: '8px'
+  },
+  markAllBtn: {
+    background: 'none',
+    border: 'none',
+    color: 'var(--forest-green)',
+    fontSize: '11px',
+    cursor: 'pointer',
+    fontWeight: 'bold'
+  },
+  notifList: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '6px'
+  },
+  notifItem: {
+    padding: '8px 10px',
+    borderRadius: '6px',
+    cursor: 'pointer',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '2px',
+    textAlign: 'left',
+    transition: 'background-color 0.2s'
+  },
+  notifTitle: {
+    fontSize: '12px',
+    fontWeight: 'bold',
+    color: 'var(--text-primary)'
+  },
+  notifMsg: {
+    fontSize: '11px',
+    color: 'var(--text-secondary)'
+  },
+  notifTime: {
+    fontSize: '9px',
+    color: 'var(--text-secondary)',
+    alignSelf: 'flex-end',
+    marginTop: '2px'
+  },
+  emptyNotif: {
+    padding: '20px',
+    textAlign: 'center',
+    color: 'var(--text-secondary)',
+    fontSize: '12px'
   }
 };

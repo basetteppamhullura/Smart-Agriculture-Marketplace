@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useThemeLanguage } from '../context/ThemeLanguageContext';
+import { useSocket } from '../context/SocketContext';
 import b2bDemoCrops from '../data/b2bDemoCrops';
 import ProductReviewsSection from '../components/ProductReviewsSection';
 import NegotiationModal from '../components/NegotiationModal';
@@ -15,7 +16,7 @@ import {
 } from 'lucide-react';
 
 export default function BuyerDashboard({ actionPayload, clearActionPayload, onChangeTab }) {
-  const { user, toggleFavorite, apiUrl } = useAuth();
+  const { user, toggleFavorite, apiUrl, updateWallet } = useAuth();
   const { t } = useThemeLanguage();
 
   // Active Sub-Tab Navigation ('browse' | 'cart' | 'orders' | 'bargains' | 'subscriptions' | 'favorites' | 'account')
@@ -122,15 +123,13 @@ export default function BuyerDashboard({ actionPayload, clearActionPayload, onCh
   const [rating, setRating] = useState('5');
   const [comment, setComment] = useState('');
 
-  // Notifications state
-  const [notifications] = useState([
-    { id: 1, title: 'Live Mandi Price Drop', msg: 'Sona Masuri Paddy rate dropped to ₹3,850/Quintal in Mandya APMC.', time: '10m ago' },
-    { id: 2, title: 'Auction Bid Leading', msg: 'Your bid of ₹6,500/Quintal on Basmati Rice is currently the highest!', time: '1h ago' },
-    { id: 3, title: 'Freight In Transit', msg: 'Truck KA-11-AG-4029 carrying 50 Quintals is 45km from destination.', time: '2h ago' }
-  ]);
+  const { notifications, unreadCount, subscribe, sendChatMessage } = useSocket();
   const [showNotificationsDrawer, setShowNotificationsDrawer] = useState(false);
-
-  const token = localStorage.getItem('sam-token');
+  
+  // Active auctions list state
+  const [auctions, setAuctions] = useState([]);
+  const [biddingAmount, setBiddingAmount] = useState('');
+  const [selectedAuctionId, setSelectedAuctionId] = useState(null);
 
   // Load Crops from API & Merge with Demo Fallback Data
   const loadCrops = async () => {
@@ -145,7 +144,6 @@ export default function BuyerDashboard({ actionPayload, clearActionPayload, onCh
       if (res.ok) {
         const apiData = await res.json();
         if (Array.isArray(apiData) && apiData.length > 0) {
-          // Merge API data with b2bDemoCrops to avoid duplicate IDs, placing new farmer uploads FIRST!
           const apiIds = new Set(apiData.map(c => c._id));
           const uniqueDemos = b2bDemoCrops.filter(d => !apiIds.has(d._id));
           setCrops([...apiData, ...uniqueDemos]);
@@ -174,10 +172,68 @@ export default function BuyerDashboard({ actionPayload, clearActionPayload, onCh
     }
   };
 
+  // Fetch active auctions
+  const fetchAuctions = async () => {
+    try {
+      const res = await fetch(`${apiUrl}/auctions`);
+      if (res.ok) {
+        const data = await res.json();
+        setAuctions(data);
+      }
+    } catch (err) {
+      console.error('Failed to fetch auctions:', err);
+    }
+  };
+
   useEffect(() => {
     loadCrops();
     loadOrders();
+    fetchAuctions();
   }, [apiUrl]);
+
+  // Subscribe to real-time new crops ('mandi' channel)
+  useEffect(() => {
+    const unsubscribe = subscribe('mandi', (event) => {
+      console.log('WS Mandi Event Received:', event);
+      if (event.type === 'new_crop') {
+        setCrops(prev => {
+          if (prev.some(c => c._id === event.crop._id)) return prev;
+          return [event.crop, ...prev];
+        });
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  // Subscribe to WebSocket auction updates
+  useEffect(() => {
+    if (activeSubTab !== 'auctions' || auctions.length === 0) return;
+
+    const unsubscribes = auctions.map(auc => 
+      subscribe(`auction:${auc._id}`, (event) => {
+        console.log('WS Auction Event Received:', event);
+        if (event.type === 'new_bid') {
+          setAuctions(prev => prev.map(a => a._id === auc._id ? {
+            ...a,
+            highestBid: event.highestBid,
+            highestBidder: { name: event.highestBidderName },
+            bidsCount: event.bidsCount
+          } : a));
+        } else if (event.type === 'resolved') {
+          setAuctions(prev => prev.map(a => a._id === auc._id ? {
+            ...a,
+            status: 'completed'
+          } : a));
+          loadOrders();
+        }
+      })
+    );
+
+    return () => {
+      unsubscribes.forEach(unsub => unsub());
+    };
+  }, [activeSubTab, auctions.length]);
 
   useEffect(() => {
     loadCrops();
@@ -486,6 +542,17 @@ export default function BuyerDashboard({ actionPayload, clearActionPayload, onCh
         >
           AI Price Bargaining Hub
         </button>
+
+        <button
+          onClick={() => setActiveSubTab('auctions')}
+          style={{
+            ...styles.subTabBtn,
+            backgroundColor: activeSubTab === 'auctions' ? 'var(--forest-green)' : 'transparent',
+            color: activeSubTab === 'auctions' ? 'white' : 'var(--text-secondary)'
+          }}
+        >
+          Live Price Auctions ({auctions.filter(a => a.status === 'active').length})
+        </button>
       </div>
 
       {/* 2. MAIN B2B MARKETPLACE SHOWCASE */}
@@ -683,6 +750,483 @@ export default function BuyerDashboard({ actionPayload, clearActionPayload, onCh
               })}
             </div>
           </main>
+        </div>
+      )}
+
+      {/* RENDER SHOPPING CART TAB */}
+      {activeSubTab === 'cart' && (
+        <div className="fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          <h3>Shopping Cart (Bulk Agricultural Commodities)</h3>
+          {cart.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-secondary)' }}>
+              Your B2B cart is empty. Browse farmer listings to add crops.
+            </div>
+          ) : (
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 320px', gap: '20px', alignItems: 'start' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                {cart.map((item, idx) => (
+                  <div key={idx} className="glass-card" style={{ display: 'flex', gap: '15px', alignItems: 'center', justifyContent: 'space-between', padding: '12px' }}>
+                    <img src={item.crop.imageUrl} alt={item.crop.name} style={{ width: '80px', height: '60px', objectFit: 'cover', borderRadius: '6px' }} />
+                    <div style={{ flex: 1, paddingLeft: '10px' }}>
+                      <h4 style={{ margin: 0 }}>{item.crop.name}</h4>
+                      <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '4px' }}>
+                        Farmer: <strong>{item.crop.farmer?.name || 'Producer'}</strong>
+                      </div>
+                      <div style={{ fontSize: '13px', fontWeight: 'bold', color: 'var(--forest-green)', marginTop: '4px' }}>
+                        ₹{item.crop.price} / Quintal
+                      </div>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <button 
+                        onClick={() => {
+                          const newQty = Math.max(item.crop.minOrder || 1, item.quantityQuintals - 5);
+                          setCart(prev => prev.map(c => c.crop._id === item.crop._id ? { ...c, quantityQuintals: newQty } : c));
+                        }} 
+                        style={{ padding: '4px', border: '1px solid var(--border-color)', background: 'transparent', cursor: 'pointer', borderRadius: '4px' }}
+                      >
+                        <Minus size={14} />
+                      </button>
+                      <span style={{ fontSize: '14px', fontWeight: 'bold', width: '40px', textAlign: 'center' }}>
+                        {item.quantityQuintals} Q
+                      </span>
+                      <button 
+                        onClick={() => {
+                          const newQty = item.quantityQuintals + 5;
+                          setCart(prev => prev.map(c => c.crop._id === item.crop._id ? { ...c, quantityQuintals: newQty } : c));
+                        }} 
+                        style={{ padding: '4px', border: '1px solid var(--border-color)', background: 'transparent', cursor: 'pointer', borderRadius: '4px' }}
+                      >
+                        <Plus size={14} />
+                      </button>
+                    </div>
+                    <div style={{ fontSize: '14px', fontWeight: '800', color: 'var(--forest-green)', minWidth: '90px', textAlign: 'right' }}>
+                      ₹{(item.crop.price * item.quantityQuintals).toLocaleString()}
+                    </div>
+                    <button onClick={() => handleRemoveFromCart(item.crop._id)} className="btn btn-outline" style={{ padding: '6px 8px', color: '#ef4444', borderColor: '#ef4444' }}>
+                      <Trash2 size={14} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+
+              {/* Summary Block */}
+              <div className="glass-card" style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <h4 style={{ margin: 0, borderBottom: '1px solid var(--border-color)', paddingBottom: '8px' }}>Order Summary</h4>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
+                  <span>Total Quantity:</span>
+                  <strong>{cartTotalQuintals} Quintals</strong>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
+                  <span>Subtotal:</span>
+                  <strong>₹{cartSubtotal.toLocaleString()}</strong>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
+                  <span>Mandi GST (5%):</span>
+                  <strong>₹{cartGst.toLocaleString()}</strong>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
+                  <span>Transport Booking:</span>
+                  <strong>₹{cartShipping.toLocaleString()}</strong>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '15px', fontWeight: 'bold', borderTop: '1px solid var(--border-color)', paddingTop: '10px', color: 'var(--forest-green)' }}>
+                  <span>Grand Total:</span>
+                  <span>₹{cartGrandTotal.toLocaleString()}</span>
+                </div>
+                <button 
+                  onClick={() => {
+                    const firstItem = cart[0];
+                    setSelectedCropForCheckout(firstItem.crop);
+                    setCheckoutQtyQuintals(firstItem.quantityQuintals);
+                    setCheckoutStep(1);
+                  }} 
+                  className="btn btn-primary" 
+                  style={{ width: '100%', padding: '12px', marginTop: '10px' }}
+                >
+                  Proceed to Secure Checkout
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* RENDER MY ORDERS TAB */}
+      {activeSubTab === 'orders' && (
+        <div className="fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          <h3>My Purchase Orders & Tracking</h3>
+          {orders.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-secondary)' }}>
+              No orders found. Proceed to cart and buy crops to populate this panel.
+            </div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              {orders.map((ord) => {
+                const step = ord.deliveryStatus === 'delivered' ? 4 : ord.deliveryStatus === 'in-transit' ? 3 : ord.deliveryStatus === 'dispatched' ? 2 : 1;
+                return (
+                  <div key={ord._id} className="glass-card" style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-color)', paddingBottom: '10px' }}>
+                      <div>
+                        <strong>Order ID: {ord._id}</strong>
+                        <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '2px' }}>
+                          Placed on: {new Date(ord.createdAt).toLocaleDateString()}
+                        </div>
+                      </div>
+                      <span className="badge badge-verified" style={{ textTransform: 'capitalize' }}>
+                        {ord.deliveryStatus}
+                      </span>
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '10px', fontSize: '13px' }}>
+                      <div>Crop Name: <strong>{ord.crop?.name || 'Crop'}</strong></div>
+                      <div>Quantity: <strong>{ord.quantity} Quintals</strong></div>
+                      <div>Total Settlement: <strong style={{ color: 'var(--forest-green)' }}>₹{ord.totalAmount.toLocaleString()}</strong></div>
+                      <div>Payment Status: <strong>{ord.paymentStatus}</strong></div>
+                    </div>
+
+                    {/* Logistics Card details */}
+                    {ord.logistics && (
+                      <div style={{ display: 'flex', gap: '10px', backgroundColor: 'var(--bg-secondary)', padding: '10px', borderRadius: '8px', fontSize: '12px', alignItems: 'center' }}>
+                        <Truck size={18} color="var(--forest-green)" />
+                        <div>
+                          Logistics: <strong>{ord.logistics.partnerName} ({ord.logistics.vehicleNumber})</strong> • Driver: {ord.logistics.driverName} ({ord.logistics.driverPhone})
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Tracker timeline progress bar */}
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', margin: '15px 0', position: 'relative', width: '100%', maxWidth: '500px', alignSelf: 'center' }}>
+                      <div style={{ position: 'absolute', top: '10px', left: '10%', right: '10%', height: '3px', background: 'var(--border-color)', zIndex: 1 }}>
+                        <div style={{ width: `${(step - 1) * 33.3}%`, height: '100%', background: 'var(--forest-green)' }}></div>
+                      </div>
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', zIndex: 2 }}>
+                        <div style={{ width: '22px', height: '22px', borderRadius: '50%', background: step >= 1 ? 'var(--forest-green)' : 'var(--border-color)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: '10px', fontWeight: 'bold' }}>1</div>
+                        <span style={{ fontSize: '10px', fontWeight: '600' }}>Confirmed</span>
+                      </div>
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', zIndex: 2 }}>
+                        <div style={{ width: '22px', height: '22px', borderRadius: '50%', background: step >= 2 ? 'var(--forest-green)' : 'var(--border-color)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: '10px', fontWeight: 'bold' }}>2</div>
+                        <span style={{ fontSize: '10px', fontWeight: '600' }}>Dispatched</span>
+                      </div>
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', zIndex: 2 }}>
+                        <div style={{ width: '22px', height: '22px', borderRadius: '50%', background: step >= 3 ? 'var(--forest-green)' : 'var(--border-color)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: '10px', fontWeight: 'bold' }}>3</div>
+                        <span style={{ fontSize: '10px', fontWeight: '600' }}>In-Transit</span>
+                      </div>
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', zIndex: 2 }}>
+                        <div style={{ width: '22px', height: '22px', borderRadius: '50%', background: step >= 4 ? 'var(--forest-green)' : 'var(--border-color)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: '10px', fontWeight: 'bold' }}>4</div>
+                        <span style={{ fontSize: '10px', fontWeight: '600' }}>Delivered</span>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* RENDER BARGAINS TAB */}
+      {activeSubTab === 'bargains' && (
+        <div className="fade-in" style={{ padding: '10px 0' }}>
+          <BargainingHub />
+        </div>
+      )}
+
+      {/* RENDER LIVE AUCTIONS TAB */}
+      {activeSubTab === 'auctions' && (
+        <div className="fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <h3>Live Price Auctions (Participate & Bid in Real Time)</h3>
+            <button onClick={fetchAuctions} className="btn btn-outline" style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px' }}>
+              <RefreshCw size={14} /> Refresh Bids
+            </button>
+          </div>
+
+          {auctions.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-secondary)' }}>
+              No active auctions available right now.
+            </div>
+          ) : (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '20px' }}>
+              {auctions.map((auc) => {
+                const endsInMs = new Date(auc.endTime) - new Date();
+                const minutesLeft = Math.max(0, Math.floor(endsInMs / 60000));
+                const hoursLeft = Math.floor(minutesLeft / 60);
+                const showMins = minutesLeft % 60;
+                const isWinner = auc.highestBidder && user && (auc.highestBidder._id === user._id || auc.highestBidder === user._id);
+
+                return (
+                  <div key={auc._id} className="glass-card" style={{ display: 'flex', flexDirection: 'column', gap: '12px', padding: '16px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <h4 style={{ margin: 0, fontSize: '16px' }}>{auc.crop?.name}</h4>
+                      <span className={`badge ${auc.status === 'active' ? 'badge-verified' : 'badge-trusted'}`} style={{ textTransform: 'capitalize' }}>
+                        {auc.status === 'active' ? '🔴 Live' : 'Closed'}
+                      </span>
+                    </div>
+
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', color: 'var(--text-secondary)' }}>
+                      <span>Wholesale Quantity:</span>
+                      <strong>{auc.crop?.quantity} Quintals</strong>
+                    </div>
+
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', color: 'var(--text-secondary)' }}>
+                      <span>Initial Start Rate:</span>
+                      <strong>₹{auc.crop?.price}/Quintal</strong>
+                    </div>
+
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', borderTop: '1px solid var(--border-color)', borderBottom: '1px solid var(--border-color)', padding: '6px 0', margin: '4px 0' }}>
+                      <span>Current Highest Bid:</span>
+                      <strong style={{ color: 'var(--forest-green)', fontSize: '15px' }}>₹{auc.highestBid}/Quintal</strong>
+                    </div>
+
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', color: 'var(--text-secondary)' }}>
+                      <span>Highest Bidder:</span>
+                      <strong>{isWinner ? 'You (Leading)' : auc.highestBidder?.name || 'No bids yet'}</strong>
+                    </div>
+
+                    {/* Auction Countdown Timer */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: '#ef4444', backgroundColor: 'rgba(239,68,68,0.05)', padding: '6px 10px', borderRadius: '6px', fontWeight: 'bold' }}>
+                      <Clock size={14} />
+                      <span>
+                        {auc.status === 'active' ? `Remaining: ${hoursLeft}h ${showMins}m` : 'Resolved'}
+                      </span>
+                    </div>
+
+                    {/* Place bid input form */}
+                    {auc.status === 'active' && (
+                      <form 
+                        onSubmit={async (e) => {
+                          e.preventDefault();
+                          const amt = Number(biddingAmount);
+                          if (!amt || amt <= auc.highestBid) {
+                            alert(`Bid must be greater than current highest bid of ₹${auc.highestBid}`);
+                            return;
+                          }
+                          try {
+                            const res = await fetch(`${apiUrl}/auctions/${auc._id}/bid`, {
+                              method: 'POST',
+                              headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${token}`
+                              },
+                              body: JSON.stringify({ amount: amt })
+                            });
+                            if (res.ok) {
+                              alert('Bid placed successfully!');
+                              setBiddingAmount('');
+                              fetchAuctions();
+                              // Refresh user wallet
+                              updateWallet(0, 'refresh');
+                            } else {
+                              const errData = await res.json();
+                              alert(errData.message || 'Failed to place bid');
+                            }
+                          } catch (err) {
+                            console.error(err);
+                          }
+                        }}
+                        style={{ display: 'flex', gap: '6px', marginTop: '6px' }}
+                      >
+                        <input 
+                          type="number"
+                          className="form-input"
+                          style={{ fontSize: '12px', padding: '6px', flex: 1 }}
+                          placeholder={`Min ₹${auc.highestBid + 10}`}
+                          value={selectedAuctionId === auc._id ? biddingAmount : ''}
+                          onFocus={() => setSelectedAuctionId(auc._id)}
+                          onChange={(e) => setBiddingAmount(e.target.value)}
+                          required
+                        />
+                        <button type="submit" className="btn btn-primary" style={{ padding: '6px 14px', fontSize: '12px' }}>
+                          Bid ₹/Quintal
+                        </button>
+                      </form>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* SECURE STEPPED ESCROW CHECKOUT MODAL */}
+      {selectedCropForCheckout && (
+        <div className="modal-overlay" onClick={() => setSelectedCropForCheckout(null)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '500px', width: '92%' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', borderBottom: '1px solid var(--border-color)', paddingBottom: '8px' }}>
+              <h3 style={{ margin: 0, fontSize: '16px' }}>
+                Escrow Checkout: {selectedCropForCheckout.name} (Step {checkoutStep}/5)
+              </h3>
+              <button onClick={() => setSelectedCropForCheckout(null)} style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
+                <X size={20} />
+              </button>
+            </div>
+
+            {/* STEP 1: Address */}
+            {checkoutStep === 1 && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <div className="form-group">
+                  <label>Consignee Full Name</label>
+                  <input type="text" className="form-input" value={deliveryAddress.name} onChange={(e) => setDeliveryAddress(prev => ({ ...prev, name: e.target.value }))} required />
+                </div>
+                <div className="form-group">
+                  <label>Wholesale Delivery Address</label>
+                  <input type="text" className="form-input" value={deliveryAddress.address} onChange={(e) => setDeliveryAddress(prev => ({ ...prev, address: e.target.value }))} required />
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                  <div className="form-group">
+                    <label>District</label>
+                    <input type="text" className="form-input" value={deliveryAddress.district} onChange={(e) => setDeliveryAddress(prev => ({ ...prev, district: e.target.value }))} required />
+                  </div>
+                  <div className="form-group">
+                    <label>Pincode</label>
+                    <input type="text" className="form-input" value={deliveryAddress.pincode} onChange={(e) => setDeliveryAddress(prev => ({ ...prev, pincode: e.target.value }))} required />
+                  </div>
+                </div>
+                <button onClick={() => setCheckoutStep(2)} className="btn btn-primary" style={{ padding: '12px', marginTop: '10px' }}>
+                  Proceed to Shipping Method
+                </button>
+              </div>
+            )}
+
+            {/* STEP 2: Logistics */}
+            {checkoutStep === 2 && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <h4>Choose Delivery Transportation</h4>
+                <div 
+                  onClick={() => setLogisticsSpeed('express')}
+                  style={{ padding: '12px', border: `2px solid ${logisticsSpeed === 'express' ? 'var(--forest-green)' : 'var(--border-color)'}`, borderRadius: '8px', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+                >
+                  <div>
+                    <strong>Express Mandi Freight Delivery</strong>
+                    <div style={{ fontSize: '11px', color: 'var(--text-secondary)', marginTop: '2px' }}>ETA: 1-2 Days • Insured Cold Carriage</div>
+                  </div>
+                  <strong>₹1,200</strong>
+                </div>
+                <div 
+                  onClick={() => setLogisticsSpeed('standard')}
+                  style={{ padding: '12px', border: `2px solid ${logisticsSpeed === 'standard' ? 'var(--forest-green)' : 'var(--border-color)'}`, borderRadius: '8px', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+                >
+                  <div>
+                    <strong>Standard APMC Freight Transport</strong>
+                    <div style={{ fontSize: '11px', color: 'var(--text-secondary)', marginTop: '2px' }}>ETA: 3-5 Days • Open Bed Tata Lorry</div>
+                  </div>
+                  <strong>₹500</strong>
+                </div>
+                <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
+                  <button onClick={() => setCheckoutStep(1)} className="btn btn-secondary" style={{ flex: 1 }}>Back</button>
+                  <button onClick={() => setCheckoutStep(3)} className="btn btn-primary" style={{ flex: 1 }}>Proceed to Payment</button>
+                </div>
+              </div>
+            )}
+
+            {/* STEP 3: Payment */}
+            {checkoutStep === 3 && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <h4>Escrow Wallet Payment</h4>
+                <div style={{ backgroundColor: 'var(--bg-secondary)', padding: '12px', borderRadius: '8px', fontSize: '13px' }}>
+                  <div>Crop Price: <strong>₹{selectedCropForCheckout.price} / Quintal</strong></div>
+                  <div>Quantity: <strong>{checkoutQtyQuintals} Quintals</strong></div>
+                  <div style={{ borderTop: '1px solid var(--border-color)', paddingTop: '6px', marginTop: '6px', fontWeight: 'bold', fontSize: '14px', color: 'var(--forest-green)' }}>
+                    Total Deductible: ₹{(selectedCropForCheckout.price * checkoutQtyQuintals).toLocaleString()}
+                  </div>
+                  <div style={{ fontSize: '11px', color: 'var(--text-secondary)', marginTop: '4px' }}>
+                    Available Wallet Balance: ₹{user?.walletBalance.toLocaleString()}
+                  </div>
+                </div>
+                <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
+                  <button onClick={() => setCheckoutStep(2)} className="btn btn-secondary" style={{ flex: 1 }}>Back</button>
+                  <button 
+                    onClick={() => {
+                      if (user?.walletBalance < (selectedCropForCheckout.price * checkoutQtyQuintals)) {
+                        alert('Insufficient wallet balance. Please top up your wallet first.');
+                        return;
+                      }
+                      setCheckoutStep(4);
+                    }} 
+                    className="btn btn-primary" 
+                    style={{ flex: 1 }}
+                  >
+                    Pay From Wallet
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* STEP 4: OTP Verification */}
+            {checkoutStep === 4 && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <h4>Security Escrow OTP</h4>
+                <p style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>We've sent a mock verification code. Type **1234** to verify the B2B purchase contract.</p>
+                <input 
+                  type="text" 
+                  className="form-input" 
+                  style={{ textAlign: 'center', letterSpacing: '4px', fontSize: '18px', fontWeight: 'bold' }} 
+                  placeholder="e.g. 1234"
+                  value={otpCode}
+                  onChange={(e) => setOtpCode(e.target.value)}
+                />
+                <button 
+                  onClick={async () => {
+                    if (otpCode !== '1234') {
+                      alert('Invalid verification code. Please enter 1234.');
+                      return;
+                    }
+                    // Place order
+                    try {
+                      const res = await fetch(`${apiUrl}/orders`, {
+                        method: 'POST',
+                        headers: {
+                          'Content-Type': 'application/json',
+                          'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify({
+                          cropId: selectedCropForCheckout._id,
+                          quantity: checkoutQtyQuintals
+                        })
+                      });
+                      if (res.ok) {
+                        setCheckoutStep(5);
+                        loadOrders();
+                        updateWallet(0, 'refresh'); // Reload profile wallet
+                      } else {
+                        const err = await res.json();
+                        alert(err.message || 'Order failed');
+                      }
+                    } catch (err) {
+                      console.error(err);
+                    }
+                  }} 
+                  className="btn btn-primary" 
+                  style={{ padding: '12px', marginTop: '10px' }}
+                >
+                  Verify & Settle Escrow Contract
+                </button>
+              </div>
+            )}
+
+            {/* STEP 5: Success */}
+            {checkoutStep === 5 && (
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px', padding: '10px 0', textAlign: 'center' }}>
+                <CheckCircle2 size={48} color="var(--emerald)" />
+                <h4 style={{ margin: 0 }}>Wholesale Transaction Complete!</h4>
+                <p style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
+                  Escrow settlement initialized. Farmers will dispatch produce within 24 hours. Track delivery in the "My Orders" tab.
+                </p>
+                <button 
+                  onClick={() => {
+                    setSelectedCropForCheckout(null);
+                    setCheckoutStep(1);
+                    setCart([]);
+                    setActiveSubTab('orders');
+                  }} 
+                  className="btn btn-primary" 
+                  style={{ width: '100%', padding: '12px', marginTop: '10px' }}
+                >
+                  Close & View Order Tracker
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       )}
 

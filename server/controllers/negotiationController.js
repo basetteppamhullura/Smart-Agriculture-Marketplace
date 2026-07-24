@@ -1,4 +1,6 @@
 const dbManager = require('../utils/dbManager');
+const { createNotification } = require('../utils/notificationHelper');
+const socketManager = require('../utils/socketManager');
 
 // @desc    Initiate a new price negotiation
 // @route   POST /api/negotiations
@@ -62,6 +64,14 @@ const startNegotiation = async (req, res) => {
       }]
     });
 
+    await createNotification(
+      farmerId,
+      'New Buyer Offer Received',
+      `Buyer ${req.user.name} has offered ₹${offer}/Quintal for ${crop.name}.`,
+      'negotiation',
+      negotiation._id
+    );
+
     res.status(201).json(negotiation);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -120,6 +130,9 @@ const counterOffer = async (req, res) => {
     }
 
     const senderRole = isBuyer ? 'buyer' : 'seller';
+    const recipientId = isBuyer ? negotiation.seller._id : negotiation.buyer._id;
+    const recipientName = isBuyer ? negotiation.sellerName : negotiation.buyerName;
+    const senderName = isBuyer ? negotiation.buyerName : negotiation.sellerName;
 
     const updated = await dbManager.negotiations.findByIdAndUpdate(req.params.id, {
       currentOffer: offer,
@@ -132,6 +145,19 @@ const counterOffer = async (req, res) => {
           offer
         }
       }
+    });
+
+    await createNotification(
+      recipientId,
+      isBuyer ? 'Buyer Sent a Counter Offer' : 'Farmer Sent a Counter Offer',
+      `${senderName} submitted a counter-offer of ₹${offer}/Quintal.`,
+      'negotiation',
+      req.params.id
+    );
+
+    socketManager.broadcastToChannel(`negotiation:${req.params.id}`, {
+      type: 'counter',
+      negotiation: updated
     });
 
     res.json(updated);
@@ -158,6 +184,8 @@ const acceptOffer = async (req, res) => {
     }
 
     const senderRole = isBuyer ? 'buyer' : 'seller';
+    const recipientId = isBuyer ? negotiation.seller._id : negotiation.buyer._id;
+    const senderName = isBuyer ? negotiation.buyerName : negotiation.sellerName;
 
     const updated = await dbManager.negotiations.findByIdAndUpdate(req.params.id, {
       status: 'Accepted',
@@ -168,6 +196,19 @@ const acceptOffer = async (req, res) => {
           offer: negotiation.currentOffer
         }
       }
+    });
+
+    await createNotification(
+      recipientId,
+      isBuyer ? 'Buyer Accepted Counter Offer' : 'Farmer Accepted Your Offer',
+      `${senderName} accepted the offer of ₹${negotiation.currentOffer}/Quintal.`,
+      'negotiation',
+      req.params.id
+    );
+
+    socketManager.broadcastToChannel(`negotiation:${req.params.id}`, {
+      type: 'accept',
+      negotiation: updated
     });
 
     res.json(updated);
@@ -194,6 +235,8 @@ const rejectOffer = async (req, res) => {
     }
 
     const senderRole = isBuyer ? 'buyer' : 'seller';
+    const recipientId = isBuyer ? negotiation.seller._id : negotiation.buyer._id;
+    const senderName = isBuyer ? negotiation.buyerName : negotiation.sellerName;
 
     const updated = await dbManager.negotiations.findByIdAndUpdate(req.params.id, {
       status: 'Rejected',
@@ -204,6 +247,19 @@ const rejectOffer = async (req, res) => {
           offer: negotiation.currentOffer
         }
       }
+    });
+
+    await createNotification(
+      recipientId,
+      'Bargain Offer Rejected',
+      `${senderName} declined the bargaining proposal.`,
+      'negotiation',
+      req.params.id
+    );
+
+    socketManager.broadcastToChannel(`negotiation:${req.params.id}`, {
+      type: 'reject',
+      negotiation: updated
     });
 
     res.json(updated);

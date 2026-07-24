@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { SocketProvider } from './context/SocketContext';
 import { ThemeLanguageProvider, useThemeLanguage } from './context/ThemeLanguageContext';
 import Navbar from './components/Navbar';
 import Sidebar from './components/Sidebar';
@@ -185,9 +186,11 @@ function MainAppContent() {
 export default function App() {
   return (
     <AuthProvider>
-      <ThemeLanguageProvider>
-        <MainAppContent />
-      </ThemeLanguageProvider>
+      <SocketProvider>
+        <ThemeLanguageProvider>
+          <MainAppContent />
+        </ThemeLanguageProvider>
+      </SocketProvider>
     </AuthProvider>
   );
 }

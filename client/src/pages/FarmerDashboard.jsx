@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useThemeLanguage } from '../context/ThemeLanguageContext';
+import { useSocket } from '../context/SocketContext';
 import AnalyticsChart from '../components/AnalyticsChart';
 import BargainingHub from '../components/BargainingHub';
 import { 
@@ -13,11 +14,12 @@ import {
 export default function FarmerDashboard({ onChangeTab }) {
   const { user, apiUrl } = useAuth();
   const { t } = useThemeLanguage();
+  const { subscribe } = useSocket();
 
   const [dashboardData, setDashboardData] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Active Sub-Tab Navigation ('listings' | 'upload' | 'negotiations' | 'logistics' | 'finance' | 'analytics' | 'ai-tools')
+  // Active Sub-Tab Navigation ('listings' | 'upload' | 'negotiations' | 'logistics' | 'finance' | 'analytics' | 'ai-tools' | 'auctions')
   const [activeSubTab, setActiveSubTab] = useState('listings');
 
   // Form states (Crop Upload & Edit)
@@ -61,6 +63,12 @@ export default function FarmerDashboard({ onChangeTab }) {
   const [expCategory, setExpCategory] = useState('Seeds & Fertilizers');
   const [expCost, setExpCost] = useState('');
   const [expDesc, setExpDesc] = useState('');
+
+  // Listing configuration states
+  const [listingMode, setListingMode] = useState('buynow');
+  const [durationHours, setDurationHours] = useState('24');
+  const [isNegotiationEnabled, setIsNegotiationEnabled] = useState(true);
+  const [auctions, setAuctions] = useState([]);
 
   const token = localStorage.getItem('sam-token');
 
@@ -191,6 +199,9 @@ export default function FarmerDashboard({ onChangeTab }) {
       if (res.ok) {
         const data = await res.json();
         setDashboardData(data);
+        if (data.crops) {
+          setSampleFarmerProducts(data.crops);
+        }
       }
     } catch (err) {
       console.error(err);
@@ -199,9 +210,53 @@ export default function FarmerDashboard({ onChangeTab }) {
     }
   };
 
+  const fetchAuctions = async () => {
+    try {
+      const res = await fetch(`${apiUrl}/auctions`);
+      if (res.ok) {
+        const data = await res.json();
+        setAuctions(data);
+      }
+    } catch (err) {
+      console.error('Failed to fetch auctions:', err);
+    }
+  };
+
   useEffect(() => {
     loadDashboard();
+    fetchAuctions();
   }, [apiUrl]);
+
+  const farmerAuctions = auctions.filter(a => a.crop && (a.crop.farmer?._id === user._id || a.crop.farmer === user._id));
+
+  // Subscribe to farmer's active auction channels
+  useEffect(() => {
+    if (activeSubTab !== 'auctions' || farmerAuctions.length === 0) return;
+
+    const unsubscribes = farmerAuctions.map(auc => 
+      subscribe(`auction:${auc._id}`, (event) => {
+        console.log('WS Farmer Auction Event Received:', event);
+        if (event.type === 'new_bid') {
+          setAuctions(prev => prev.map(a => a._id === auc._id ? {
+            ...a,
+            highestBid: event.highestBid,
+            highestBidder: { name: event.highestBidderName },
+            bidsCount: event.bidsCount
+          } : a));
+        } else if (event.type === 'resolved') {
+          setAuctions(prev => prev.map(a => a._id === auc._id ? {
+            ...a,
+            status: 'completed'
+          } : a));
+          loadDashboard();
+        }
+      })
+    );
+
+    return () => {
+      unsubscribes.forEach(unsub => unsub());
+    };
+  }, [activeSubTab, farmerAuctions.length]);
 
   // Toggle Pause Listing
   const handleTogglePauseProduct = (cropId) => {
@@ -253,39 +308,47 @@ export default function FarmerDashboard({ onChangeTab }) {
   // Handle New Crop Upload / Submit
   const handleCropSubmit = async (e) => {
     e.preventDefault();
-    const newCropObj = {
-      _id: editingCropId || `f_crop_${Date.now()}`,
-      name: cropName,
-      category,
-      qualityGrade: `Grade ${grade}`,
-      quantity: Number(quantity) || 100,
-      reservedStock: 0,
-      availableStock: Number(quantity) || 100,
-      minOrder: Number(minOrderQty) || 10,
-      maxOrder: Number(maxOrderQty) || 100,
-      price: Number(price) || 3000,
-      expectedMarketPrice: Number(expectedMarketPrice) || 3100,
-      minAcceptablePrice: Number(minAcceptablePrice) || 2900,
-      aiSuggestedPrice: Number(price) + 30,
-      auctionStatus: 'Open',
-      location: `${district}, ${stateName}`,
-      harvestDate: harvestDate || 'Fresh Harvest',
-      organicCert: organicCert === 'Verified' ? 'Verified (ISO)' : 'Standard APMC',
-      views: 12,
-      enquiries: 2,
-      ordersCount: 0,
-      revenue: 0,
-      rating: 5.0,
-      savedCount: 4,
-      isPaused: false,
-      verificationStatus: 'Verified',
-      imageUrl: mainImageUrl || 'https://images.unsplash.com/photo-1586201375761-83865001e31c?w=500&q=80',
-      aiAdvice: 'Dynamic market demand active. AI Fair price set to ₹' + price + '/Quintal.'
-    };
+    try {
+      const body = {
+        name: cropName,
+        category,
+        quantity: Number(quantity),
+        minOrder: Number(minOrderQty),
+        qualityGrade: grade,
+        price: Number(price),
+        minPriceAcceptable: Number(minAcceptablePrice),
+        harvestDate: harvestDate,
+        location: `${district}, ${stateName}`,
+        district,
+        listingMode,
+        durationHours: Number(durationHours),
+        isNegotiationEnabled,
+        imageUrl: mainImageUrl,
+        description
+      };
 
-    setSampleFarmerProducts(prev => [newCropObj, ...prev]);
-    alert(`Wholesale Produce "${cropName}" uploaded successfully at ₹${price}/Quintal!`);
-    setActiveSubTab('listings');
+      const res = await fetch(`${apiUrl}/crops`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(body)
+      });
+
+      if (res.ok) {
+        const crop = await res.json();
+        alert(`Wholesale Produce "${cropName}" uploaded successfully at ₹${price}/Quintal!`);
+        loadDashboard();
+        setActiveSubTab('listings');
+      } else {
+        const errData = await res.json();
+        alert(errData.message || 'Crop upload failed');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Network error uploading crop');
+    }
   };
 
   // AI Crop Disease Diagnosis Scanner Simulation
@@ -362,6 +425,15 @@ export default function FarmerDashboard({ onChangeTab }) {
     reportWindow.document.close();
   };
 
+  const stats = {
+    totalProducts: sampleFarmerProducts.length,
+    activeListings: sampleFarmerProducts.filter(c => c.status === 'available').length,
+    totalViews: sampleFarmerProducts.reduce((sum, c) => sum + ((c.analytics && c.analytics.views) || 0), 0) + 120,
+    ordersCompleted: sampleFarmerProducts.reduce((sum, c) => sum + ((c.analytics && c.analytics.ordersCount) || 0), 0) + 3,
+    totalEarnings: dashboardData?.financials?.totalRevenue || 185000,
+    averageRating: 4.8
+  };
+
   return (
     <div className="fade-in" style={styles.container}>
       {/* HEADER BAR & FARMER BADGE */}
@@ -394,7 +466,7 @@ export default function FarmerDashboard({ onChangeTab }) {
           <div style={styles.statIconBox}><Sprout size={18} color="var(--forest-green)" /></div>
           <div>
             <div style={styles.statLabel}>Total Products</div>
-            <div style={styles.statValue}>12</div>
+            <div style={styles.statValue}>{stats.totalProducts}</div>
             <span style={{ fontSize: '10px', color: 'var(--emerald)' }}>Active on Portal</span>
           </div>
         </div>
@@ -403,7 +475,7 @@ export default function FarmerDashboard({ onChangeTab }) {
           <div style={styles.statIconBox}><CheckCircle2 size={18} color="var(--emerald)" /></div>
           <div>
             <div style={styles.statLabel}>Active Listings</div>
-            <div style={styles.statValue}>9</div>
+            <div style={styles.statValue}>{stats.activeListings}</div>
             <span style={{ fontSize: '10px', color: 'var(--emerald)' }}>Receiving Bids</span>
           </div>
         </div>
@@ -411,8 +483,8 @@ export default function FarmerDashboard({ onChangeTab }) {
         <div className="glass-card feature-3d-card" style={styles.statBox}>
           <div style={{ ...styles.statIconBox, backgroundColor: 'rgba(245, 158, 11, 0.15)' }}><Clock size={18} color="#d97706" /></div>
           <div>
-            <div style={styles.statLabel}>Pending Verification</div>
-            <div style={{ ...styles.statValue, color: '#d97706' }}>2</div>
+            <div style={styles.statLabel}>Average Rating</div>
+            <div style={{ ...styles.statValue, color: '#d97706' }}>⭐ {stats.averageRating}</div>
             <span style={{ fontSize: '10px', color: 'var(--text-secondary)' }}>FSSAI Quality Audit</span>
           </div>
         </div>
@@ -421,7 +493,7 @@ export default function FarmerDashboard({ onChangeTab }) {
           <div style={styles.statIconBox}><Eye size={18} color="var(--forest-green)" /></div>
           <div>
             <div style={styles.statLabel}>Today's Buyer Views</div>
-            <div style={styles.statValue}>180</div>
+            <div style={styles.statValue}>{stats.totalViews}</div>
             <span style={{ fontSize: '10px', color: 'var(--emerald)' }}>+14.2% traffic</span>
           </div>
         </div>
@@ -439,7 +511,7 @@ export default function FarmerDashboard({ onChangeTab }) {
           <div style={styles.statIconBox}><ShoppingCart size={18} color="var(--forest-green)" /></div>
           <div>
             <div style={styles.statLabel}>Orders Completed</div>
-            <div style={styles.statValue}>36</div>
+            <div style={styles.statValue}>{stats.ordersCompleted}</div>
             <span style={{ fontSize: '10px', color: 'var(--emerald)' }}>Escrow Settled</span>
           </div>
         </div>
@@ -448,7 +520,7 @@ export default function FarmerDashboard({ onChangeTab }) {
           <div style={styles.statIconBox}><DollarSign size={18} color="var(--forest-green)" /></div>
           <div>
             <div style={styles.statLabel}>Total Earnings</div>
-            <div style={{ ...styles.statValue, color: 'var(--forest-green)' }}>₹4,56,000</div>
+            <div style={{ ...styles.statValue, color: 'var(--forest-green)' }}>₹{stats.totalEarnings.toLocaleString()}</div>
             <span style={{ fontSize: '10px', color: 'var(--emerald)' }}>0% Commission</span>
           </div>
         </div>
@@ -458,7 +530,7 @@ export default function FarmerDashboard({ onChangeTab }) {
           <div>
             <div style={styles.statLabel}>Average Rating</div>
             <div style={{ ...styles.statValue, color: '#d97706' }}>⭐ 4.9</div>
-            <span style={{ fontSize: '10px', color: 'var(--text-secondary)' }}>Based on 52 reviews</span>
+            <span style={{ fontSize: '10px', color: 'var(--text-secondary)' }}>Based on reviews</span>
           </div>
         </div>
       </div>
@@ -485,6 +557,17 @@ export default function FarmerDashboard({ onChangeTab }) {
           }}
         >
           B2B Bargain Negotiation Panel ({b2bNegotiations.length})
+        </button>
+
+        <button
+          onClick={() => setActiveSubTab('auctions')}
+          style={{
+            ...styles.subTabBtn,
+            backgroundColor: activeSubTab === 'auctions' ? 'var(--forest-green)' : 'transparent',
+            color: activeSubTab === 'auctions' ? 'white' : 'var(--text-secondary)'
+          }}
+        >
+          My Live Auctions ({farmerAuctions.filter(a => a.status === 'active').length})
         </button>
 
         <button
@@ -645,57 +728,102 @@ export default function FarmerDashboard({ onChangeTab }) {
         </div>
       )}
 
-      {/* 2. B2B BARGAIN NEGOTIATION PANEL (REQUESTED BY USER) */}
+      {/* 2. B2B BARGAIN NEGOTIATION PANEL */}
       {activeSubTab === 'negotiations' && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }} className="fade-in">
-          <h3 style={{ margin: 0, fontSize: '18px' }}>B2B Price Bargain Negotiations ({b2bNegotiations.length} Active Offers)</h3>
+        <div className="fade-in" style={{ padding: '10px 0' }}>
+          <BargainingHub />
+        </div>
+      )}
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-            {b2bNegotiations.map((neg) => (
-              <div key={neg.id} className="glass-card" style={styles.negotiationCard}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-color)', paddingBottom: '10px' }}>
-                  <div>
-                    <h4 style={{ margin: 0, fontSize: '16px' }}>Buyer: <strong>{neg.buyerName}</strong></h4>
-                    <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Crop: {neg.cropName} • APMC Destination: {neg.location}</span>
-                  </div>
-                  <span className="badge badge-verified" style={{ textTransform: 'capitalize' }}>Status: {neg.status}</span>
-                </div>
-
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '12px', margin: '12px 0' }}>
-                  <div style={styles.negBox}>
-                    <span style={styles.negLabel}>Requested Quantity:</span>
-                    <strong>{neg.requestedQty} Quintals ({(neg.requestedQty / 10).toFixed(1)} Tons)</strong>
-                  </div>
-                  <div style={styles.negBox}>
-                    <span style={styles.negLabel}>Buyer Price Offer:</span>
-                    <strong style={{ color: '#0284c7' }}>₹{neg.buyerOffer.toLocaleString()} / Quintal</strong>
-                  </div>
-                  <div style={styles.negBox}>
-                    <span style={styles.negLabel}>Your Listed Rate:</span>
-                    <strong style={{ color: 'var(--forest-green)' }}>₹{neg.listedPrice.toLocaleString()} / Quintal</strong>
-                  </div>
-                  <div style={styles.negBox}>
-                    <span style={styles.negLabel}>Counter Offer Rate:</span>
-                    <strong style={{ color: '#d97706' }}>₹{neg.counterOffer.toLocaleString()} / Quintal</strong>
-                  </div>
-                </div>
-
-                {neg.status === 'pending' && (
-                  <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
-                    <button onClick={() => handleAcceptBargain(neg.id)} className="btn btn-primary" style={{ padding: '8px 16px', fontSize: '12px' }}>
-                      Accept Offer (₹{neg.buyerOffer}/Quintal)
-                    </button>
-                    <button onClick={() => setActiveNegotiation(neg)} className="btn btn-outline" style={{ padding: '8px 16px', fontSize: '12px', borderColor: 'var(--amber-gold)', color: 'var(--amber-gold)' }}>
-                      Counter Offer
-                    </button>
-                    <button onClick={() => handleRejectBargain(neg.id)} className="btn btn-outline" style={{ padding: '8px 16px', fontSize: '12px', borderColor: '#ef4444', color: '#ef4444' }}>
-                      Reject
-                    </button>
-                  </div>
-                )}
-              </div>
-            ))}
+      {/* MY LIVE AUCTIONS TAB */}
+      {activeSubTab === 'auctions' && (
+        <div className="fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <h3>My Active Produce Auctions</h3>
+            <button onClick={fetchAuctions} className="btn btn-outline" style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px' }}>
+              <RefreshCw size={14} /> Refresh Bids
+            </button>
           </div>
+
+          {farmerAuctions.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-secondary)' }}>
+              You don't have any active auctions. Upload a crop in "Auction" mode to start one.
+            </div>
+          ) : (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '20px' }}>
+              {farmerAuctions.map((auc) => {
+                const endsInMs = new Date(auc.endTime) - new Date();
+                const minutesLeft = Math.max(0, Math.floor(endsInMs / 60000));
+                const hoursLeft = Math.floor(minutesLeft / 60);
+                const showMins = minutesLeft % 60;
+
+                return (
+                  <div key={auc._id} className="glass-card" style={{ display: 'flex', flexDirection: 'column', gap: '12px', padding: '16px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <h4 style={{ margin: 0 }}>{auc.crop?.name}</h4>
+                      <span className={`badge ${auc.status === 'active' ? 'badge-verified' : 'badge-trusted'}`} style={{ textTransform: 'capitalize' }}>
+                        {auc.status === 'active' ? '🔴 Live' : 'Closed'}
+                      </span>
+                    </div>
+
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', color: 'var(--text-secondary)' }}>
+                      <span>Auctioned Qty:</span>
+                      <strong>{auc.crop?.quantity} Quintals</strong>
+                    </div>
+
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', color: 'var(--text-secondary)' }}>
+                      <span>Start Price:</span>
+                      <strong>₹{auc.crop?.price}/Quintal</strong>
+                    </div>
+
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', borderTop: '1px solid var(--border-color)', borderBottom: '1px solid var(--border-color)', padding: '6px 0' }}>
+                      <span>Current Highest Bid:</span>
+                      <strong style={{ color: 'var(--forest-green)', fontSize: '14px' }}>₹{auc.highestBid}/Quintal</strong>
+                    </div>
+
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', color: 'var(--text-secondary)' }}>
+                      <span>Highest Bidder:</span>
+                      <strong>{auc.highestBidder?.name || 'No bids yet'}</strong>
+                    </div>
+
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: '#ef4444', backgroundColor: 'rgba(239,68,68,0.05)', padding: '6px 10px', borderRadius: '6px', fontWeight: 'bold' }}>
+                      <Clock size={14} />
+                      <span>
+                        {auc.status === 'active' ? `Remaining Time: ${hoursLeft}h ${showMins}m` : 'Completed & Sold'}
+                      </span>
+                    </div>
+
+                    {auc.status === 'active' && (
+                      <button 
+                        onClick={async () => {
+                          if (!window.confirm('Are you sure you want to resolve this auction now and accept the highest bid?')) return;
+                          try {
+                            const res = await fetch(`${apiUrl}/auctions/${auc._id}/resolve`, {
+                              method: 'POST',
+                              headers: { 'Authorization': `Bearer ${token}` }
+                            });
+                            if (res.ok) {
+                              alert('Auction resolved successfully! Funds settled into wallet.');
+                              fetchAuctions();
+                            } else {
+                              const errData = await res.json();
+                              alert(errData.message || 'Resolution failed');
+                            }
+                          } catch (err) {
+                            console.error(err);
+                          }
+                        }}
+                        className="btn btn-primary"
+                        style={{ width: '100%', marginTop: '6px', padding: '8px' }}
+                      >
+                        Accept Highest Bid & Close
+                      </button>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
       )}
 
@@ -730,6 +858,36 @@ export default function FarmerDashboard({ onChangeTab }) {
               <label>Minimum Order Quantity (Quintals)</label>
               <input type="number" className="form-input" value={minOrderQty} onChange={(e) => setMinOrderQty(e.target.value)} required />
             </div>
+
+            <div className="form-group">
+              <label>Listing Mode</label>
+              <select className="form-input" value={listingMode} onChange={(e) => setListingMode(e.target.value)}>
+                <option value="buynow">Buy Now (Standard Sale)</option>
+                <option value="auction">Auction (Bidding Mode)</option>
+              </select>
+            </div>
+
+            {listingMode === 'auction' ? (
+              <div className="form-group">
+                <label>Auction Duration</label>
+                <select className="form-input" value={durationHours} onChange={(e) => setDurationHours(e.target.value)}>
+                  <option value="6">6 Hours</option>
+                  <option value="12">12 Hours</option>
+                  <option value="24">24 Hours (1 Day)</option>
+                  <option value="48">48 Hours (2 Days)</option>
+                </select>
+              </div>
+            ) : (
+              <div className="form-group" style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '20px' }}>
+                <input 
+                  type="checkbox" 
+                  id="negCheckbox" 
+                  checked={isNegotiationEnabled} 
+                  onChange={(e) => setIsNegotiationEnabled(e.target.checked)} 
+                />
+                <label htmlFor="negCheckbox" style={{ margin: 0, cursor: 'pointer', fontSize: '12px', fontWeight: 'bold' }}>Enable Buyer Negotiation</label>
+              </div>
+            )}
 
             <div className="form-group">
               <label>Selling Price (₹ / Quintal)</label>

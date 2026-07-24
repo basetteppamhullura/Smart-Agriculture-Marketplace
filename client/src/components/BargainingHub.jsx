@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useThemeLanguage } from '../context/ThemeLanguageContext';
+import { useSocket } from '../context/SocketContext';
 import { MessageSquare, ThumbsUp, XCircle, RefreshCw, Send, CheckCircle, CreditCard, ShoppingBag, ShieldAlert } from 'lucide-react';
 
 export default function BargainingHub() {
   const { user, apiUrl } = useAuth();
   const { t } = useThemeLanguage();
+  const { subscribe, sendChatMessage } = useSocket();
 
   const token = localStorage.getItem('sam-token');
 
@@ -44,6 +46,33 @@ export default function BargainingHub() {
   useEffect(() => {
     fetchNegotiations();
   }, [apiUrl, user]);
+
+  useEffect(() => {
+    if (!activeId) return;
+
+    const unsubscribe = subscribe(`negotiation:${activeId}`, (event) => {
+      console.log('Received WebSocket negotiation update:', event);
+      if (event.type === 'chat') {
+        setNegotiations(prev => prev.map(n => {
+          if (n._id === activeId) {
+            const msgExists = (n.messages || []).some(m => m.text === event.text && m.sender === event.sender && Math.abs(new Date(m.createdAt) - new Date(event.createdAt)) < 2000);
+            if (msgExists) return n;
+            return {
+              ...n,
+              messages: [...(n.messages || []), event]
+            };
+          }
+          return n;
+        }));
+      } else if (event.type === 'counter' || event.type === 'accept' || event.type === 'reject') {
+        setNegotiations(prev => prev.map(n => n._id === activeId ? event.negotiation : n));
+      }
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, [activeId]);
 
   const activeNeg = negotiations.find(n => n._id === activeId);
 
@@ -84,7 +113,10 @@ export default function BargainingHub() {
   // Submit Counteroffer
   const handleCounter = async (e, negId) => {
     e.preventDefault();
-    if (!counterPrice || Number(counterPrice) <= 0) return;
+    if (!counterPrice && !chatMessage.trim()) return;
+
+    const activeNeg = negotiations.find(n => n._id === negId);
+    const offerPriceToSend = counterPrice ? Number(counterPrice) : activeNeg.currentOffer;
 
     try {
       const res = await fetch(`${apiUrl}/negotiations/${negId}/counter`, {
@@ -94,16 +126,21 @@ export default function BargainingHub() {
           'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({
-          offerPrice: Number(counterPrice),
-          message: chatMessage || `Counteroffer suggest price: Rs ${counterPrice}`
+          offerPrice: offerPriceToSend,
+          message: chatMessage || `Counteroffer submitted: Rs ${offerPriceToSend}/unit.`
         })
       });
 
       if (res.ok) {
+        const updated = await res.json();
+        // Update local state messages to include the user message
+        setNegotiations(prev => prev.map(n => n._id === negId ? updated : n));
+        
+        // Broadcast via WebSocket
+        sendChatMessage(negId, chatMessage || `Counteroffer submitted: Rs ${offerPriceToSend}/unit.`, user.role === 'buyer' ? 'buyer' : 'seller');
+        
         setCounterPrice('');
         setChatMessage('');
-        alert('Counteroffer sent successfully!');
-        fetchNegotiations();
       } else {
         const errData = await res.json();
         alert(errData.message || 'Counteroffer failed');

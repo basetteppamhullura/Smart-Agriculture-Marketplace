@@ -1,5 +1,6 @@
 const dbManager = require('../utils/dbManager');
 const { getImageForCrop } = require('../utils/cropImages');
+const socketManager = require('../utils/socketManager');
 
 // Helper function to mock AI pricing calculation
 const calculateAIRecommendedPrice = (cropName, grade, category) => {
@@ -103,6 +104,12 @@ const uploadCrop = async (req, res) => {
         highestBid: Number(price)
       });
     }
+
+    // Broadcast new crop in real time
+    socketManager.broadcastToChannel('mandi', {
+      type: 'new_crop',
+      crop
+    });
 
     res.status(201).json(crop);
   } catch (error) {

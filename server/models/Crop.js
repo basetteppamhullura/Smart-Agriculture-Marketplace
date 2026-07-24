@@ -25,8 +25,20 @@ const CropSchema = new mongoose.Schema({
     default: 'Grains'
   },
   quantity: {
-    type: Number, // in kg or units
+    type: Number, // in kg or units (Quintals)
     required: true
+  },
+  minOrder: {
+    type: Number,
+    default: 10
+  },
+  isAuctionEnabled: {
+    type: Boolean,
+    default: false
+  },
+  isNegotiationEnabled: {
+    type: Boolean,
+    default: true
   },
   qualityGrade: {
     type: String,

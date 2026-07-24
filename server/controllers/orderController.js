@@ -1,4 +1,5 @@
 const dbManager = require('../utils/dbManager');
+const { createNotification } = require('../utils/notificationHelper');
 
 // @desc    Create a new order (Buy Now)
 // @route   POST /api/orders
@@ -73,6 +74,24 @@ const createOrder = async (req, res) => {
       }
     });
 
+    // Notify Buyer
+    await createNotification(
+      buyerId,
+      'Order Confirmed & Paid',
+      `Your purchase of ${buyQty} Quintals of ${crop.name} was successful! ₹${totalCost.toLocaleString()} paid.`,
+      'order',
+      order._id
+    );
+
+    // Notify Farmer
+    await createNotification(
+      farmerId,
+      'New Order Received',
+      `Buyer ${buyer.name} bought ${buyQty} Quintals of ${crop.name} for ₹${totalCost.toLocaleString()}.`,
+      'order',
+      order._id
+    );
+
     res.status(201).json({
       message: 'Order purchased successfully',
       orderId: order._id,
@@ -125,6 +144,17 @@ const updateDeliveryStatus = async (req, res) => {
       deliveryStatus: status,
       $push: { trackingTimeline: timelineItem }
     });
+
+    const buyerId = updated.buyer._id || updated.buyer;
+    
+    // Notify Buyer of delivery tracking update
+    await createNotification(
+      buyerId,
+      'Delivery Status Update',
+      `Your order for ${updated.crop?.name || 'wholesale crop'} has been updated to: ${status}.`,
+      'order',
+      req.params.id
+    );
 
     res.json(updated);
   } catch (error) {

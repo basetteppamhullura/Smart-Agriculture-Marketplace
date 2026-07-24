@@ -1,8 +1,10 @@
 const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
+const http = require('http');
 const { connectDB } = require('./config/db');
 const dbManager = require('./utils/dbManager');
+const socketManager = require('./utils/socketManager');
 
 // Load environment variables
 dotenv.config();
@@ -21,6 +23,7 @@ app.use('/api/orders', require('./routes/orderRoutes'));
 app.use('/api/ai', require('./routes/aiRoutes'));
 app.use('/api/negotiations', require('./routes/negotiationRoutes'));
 app.use('/api/mandi-prices', require('./routes/mandiRoutes'));
+app.use('/api/notifications', require('./routes/notificationRoutes'));
 
 // Basic health check
 app.get('/health', (req, res) => {
@@ -39,8 +42,14 @@ const startServer = async () => {
     // 2. Seed database if empty
     await dbManager.seed();
 
-    // 3. Start listening
-    app.listen(PORT, () => {
+    // 3. Create HTTP Server
+    const server = http.createServer(app);
+
+    // 4. Initialize WebSocket Server
+    socketManager.init(server);
+
+    // 5. Start listening
+    server.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
     });
   } catch (err) {

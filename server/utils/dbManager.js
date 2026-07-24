@@ -9,6 +9,7 @@ const Order = require('../models/Order');
 const Review = require('../models/Review');
 const Question = require('../models/Question');
 const Negotiation = require('../models/Negotiation');
+const Notification = require('../models/Notification');
 const { getImageForCrop } = require('./cropImages');
 
 // Simple local JSON db helpers
@@ -1057,6 +1058,7 @@ const seedAllData = async () => {
       writeJson('reviews', seedReviews);
       writeJson('questions', seedQuestions);
       writeJson('orders', []);
+      writeJson('notifications', []);
       console.log('Local JSON Database Seeded successfully.');
     }
   }
@@ -1563,6 +1565,70 @@ const dbManager = {
       data[index] = updatedItem;
       writeJson('questions', data);
       return updatedItem;
+    },
+
+    notifications: {
+      find: async (query = {}) => {
+        if (!db.useLocalMock()) return await Notification.find(query).sort({ createdAt: -1 });
+        let data = readJson('notifications');
+        let filtered = data.filter(item => {
+          for (let k in query) {
+            if (item[k] !== query[k]) return false;
+          }
+          return true;
+        });
+        return filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      },
+      findById: async (id) => {
+        if (!db.useLocalMock()) return await Notification.findById(id);
+        let data = readJson('notifications');
+        return data.find(item => item._id === id) || null;
+      },
+      create: async (doc) => {
+        if (!db.useLocalMock()) return await Notification.create(doc);
+        let data = readJson('notifications');
+        const newDoc = { 
+          _id: generateId(), 
+          ...doc, 
+          read: false,
+          createdAt: new Date().toISOString() 
+        };
+        data.push(newDoc);
+        writeJson('notifications', data);
+        return newDoc;
+      },
+      findByIdAndUpdate: async (id, update) => {
+        if (!db.useLocalMock()) return await Notification.findByIdAndUpdate(id, update, { new: true });
+        let data = readJson('notifications');
+        let index = data.findIndex(item => item._id === id);
+        if (index === -1) return null;
+        
+        let updatedItem = { ...data[index], ...update };
+        data[index] = updatedItem;
+        writeJson('notifications', data);
+        return updatedItem;
+      },
+      updateMany: async (query, update) => {
+        if (!db.useLocalMock()) return await Notification.updateMany(query, update);
+        let data = readJson('notifications');
+        let updatedCount = 0;
+        data = data.map(item => {
+          let matches = true;
+          for (let k in query) {
+            if (item[k] !== query[k]) {
+              matches = false;
+              break;
+            }
+          }
+          if (matches) {
+            updatedCount++;
+            return { ...item, ...update };
+          }
+          return item;
+        });
+        writeJson('notifications', data);
+        return { nModified: updatedCount };
+      }
     }
   }
 };
