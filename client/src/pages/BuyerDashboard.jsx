@@ -131,6 +131,8 @@ export default function BuyerDashboard({ actionPayload, clearActionPayload, onCh
   const [biddingAmount, setBiddingAmount] = useState('');
   const [selectedAuctionId, setSelectedAuctionId] = useState(null);
 
+  const token = localStorage.getItem('sam-token');
+
   // Load Crops from API & Merge with Demo Fallback Data
   const loadCrops = async () => {
     try {
